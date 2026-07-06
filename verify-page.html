@@ -1,0 +1,1099 @@
+<!DOCTYPE html><html lang="zh"><head>
+    <script type="module">
+import RefreshRuntime from "/@react-refresh"
+RefreshRuntime.injectIntoGlobalHook(window)
+window.$RefreshReg$ = () => {}
+window.$RefreshSig$ = () => (type) => type
+window.__vite_plugin_react_preamble_installed__ = true
+</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniCanvas — 卡通动画编辑器</title>
+  <style type="text/css" data-vite-dev-id="/Users/zeruili/projects/ani_canvas/src/index.css">/*
+! tailwindcss v3.4.6 | MIT License | https://tailwindcss.com
+*//*
+1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+*/
+
+*,
+::before,
+::after {
+  box-sizing: border-box; /* 1 */
+  border-width: 0; /* 2 */
+  border-style: solid; /* 2 */
+  border-color: #e5e7eb; /* 2 */
+}
+
+::before,
+::after {
+  --tw-content: '';
+}
+
+/*
+1. Use a consistent sensible line-height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+3. Use a more readable tab size.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
+7. Disable tap highlights on iOS
+*/
+
+html,
+:host {
+  line-height: 1.5; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+  -moz-tab-size: 4; /* 3 */
+  -o-tab-size: 4;
+     tab-size: 4; /* 3 */
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; /* 4 */
+  font-feature-settings: normal; /* 5 */
+  font-variation-settings: normal; /* 6 */
+  -webkit-tap-highlight-color: transparent; /* 7 */
+}
+
+/*
+1. Remove the margin in all browsers.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+*/
+
+body {
+  margin: 0; /* 1 */
+  line-height: inherit; /* 2 */
+}
+
+/*
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+3. Ensure horizontal rules are visible by default.
+*/
+
+hr {
+  height: 0; /* 1 */
+  color: inherit; /* 2 */
+  border-top-width: 1px; /* 3 */
+}
+
+/*
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+abbr:where([title]) {
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+}
+
+/*
+Remove the default font size and weight for headings.
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*
+Reset links to optimize for opt-in styling instead of opt-out.
+*/
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/*
+Add the correct font weight in Edge and Safari.
+*/
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/*
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
+4. Correct the odd `em` font sizing in all browsers.
+*/
+
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* 1 */
+  font-feature-settings: normal; /* 2 */
+  font-variation-settings: normal; /* 3 */
+  font-size: 1em; /* 4 */
+}
+
+/*
+Add the correct font size in all browsers.
+*/
+
+small {
+  font-size: 80%;
+}
+
+/*
+Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+*/
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/*
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+3. Remove gaps between table borders by default.
+*/
+
+table {
+  text-indent: 0; /* 1 */
+  border-color: inherit; /* 2 */
+  border-collapse: collapse; /* 3 */
+}
+
+/*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-feature-settings: inherit; /* 1 */
+  font-variation-settings: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  font-weight: inherit; /* 1 */
+  line-height: inherit; /* 1 */
+  letter-spacing: inherit; /* 1 */
+  color: inherit; /* 1 */
+  margin: 0; /* 2 */
+  padding: 0; /* 3 */
+}
+
+/*
+Remove the inheritance of text transform in Edge and Firefox.
+*/
+
+button,
+select {
+  text-transform: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+button,
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
+  -webkit-appearance: button; /* 1 */
+  background-color: transparent; /* 2 */
+  background-image: none; /* 2 */
+}
+
+/*
+Use the modern Firefox focus style for all focusable elements.
+*/
+
+:-moz-focusring {
+  outline: auto;
+}
+
+/*
+Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+*/
+
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+/*
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+progress {
+  vertical-align: baseline;
+}
+
+/*
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/*
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+[type='search'] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/*
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to `inherit` in Safari.
+*/
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/*
+Add the correct display in Chrome and Safari.
+*/
+
+summary {
+  display: list-item;
+}
+
+/*
+Removes the default spacing and border for appropriate elements.
+*/
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+Reset default styling for dialogs.
+*/
+dialog {
+  padding: 0;
+}
+
+/*
+Prevent resizing textareas horizontally by default.
+*/
+
+textarea {
+  resize: vertical;
+}
+
+/*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+input::-moz-placeholder, textarea::-moz-placeholder {
+  opacity: 1; /* 1 */
+  color: #9ca3af; /* 2 */
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1; /* 1 */
+  color: #9ca3af; /* 2 */
+}
+
+/*
+Set the default cursor for buttons.
+*/
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/*
+Make sure disabled buttons don't get the pointer cursor.
+*/
+:disabled {
+  cursor: default;
+}
+
+/*
+1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+   This can trigger a poorly considered lint error in some tools but is included by design.
+*/
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block; /* 1 */
+  vertical-align: middle; /* 2 */
+}
+
+/*
+Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+*/
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make elements with the HTML hidden attribute stay hidden by default */
+[hidden] {
+  display: none;
+}
+
+*, ::before, ::after {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x:  ;
+  --tw-pan-y:  ;
+  --tw-pinch-zoom:  ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;
+  --tw-gradient-to-position:  ;
+  --tw-ordinal:  ;
+  --tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;
+  --tw-numeric-spacing:  ;
+  --tw-numeric-fraction:  ;
+  --tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur:  ;
+  --tw-brightness:  ;
+  --tw-contrast:  ;
+  --tw-grayscale:  ;
+  --tw-hue-rotate:  ;
+  --tw-invert:  ;
+  --tw-saturate:  ;
+  --tw-sepia:  ;
+  --tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;
+  --tw-backdrop-brightness:  ;
+  --tw-backdrop-contrast:  ;
+  --tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;
+  --tw-backdrop-invert:  ;
+  --tw-backdrop-opacity:  ;
+  --tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
+}
+
+::backdrop {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x:  ;
+  --tw-pan-y:  ;
+  --tw-pinch-zoom:  ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;
+  --tw-gradient-to-position:  ;
+  --tw-ordinal:  ;
+  --tw-slashed-zero:  ;
+  --tw-numeric-figure:  ;
+  --tw-numeric-spacing:  ;
+  --tw-numeric-fraction:  ;
+  --tw-ring-inset:  ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur:  ;
+  --tw-brightness:  ;
+  --tw-contrast:  ;
+  --tw-grayscale:  ;
+  --tw-hue-rotate:  ;
+  --tw-invert:  ;
+  --tw-saturate:  ;
+  --tw-sepia:  ;
+  --tw-drop-shadow:  ;
+  --tw-backdrop-blur:  ;
+  --tw-backdrop-brightness:  ;
+  --tw-backdrop-contrast:  ;
+  --tw-backdrop-grayscale:  ;
+  --tw-backdrop-hue-rotate:  ;
+  --tw-backdrop-invert:  ;
+  --tw-backdrop-opacity:  ;
+  --tw-backdrop-saturate:  ;
+  --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
+}
+.container {
+  width: 100%;
+}
+@media (min-width: 640px) {
+
+  .container {
+    max-width: 640px;
+  }
+}
+@media (min-width: 768px) {
+
+  .container {
+    max-width: 768px;
+  }
+}
+@media (min-width: 1024px) {
+
+  .container {
+    max-width: 1024px;
+  }
+}
+@media (min-width: 1280px) {
+
+  .container {
+    max-width: 1280px;
+  }
+}
+@media (min-width: 1536px) {
+
+  .container {
+    max-width: 1536px;
+  }
+}
+.pointer-events-none {
+  pointer-events: none;
+}
+.visible {
+  visibility: visible;
+}
+.fixed {
+  position: fixed;
+}
+.absolute {
+  position: absolute;
+}
+.relative {
+  position: relative;
+}
+.inset-0 {
+  inset: 0px;
+}
+.inset-y-0 {
+  top: 0px;
+  bottom: 0px;
+}
+.-left-1\.5 {
+  left: -0.375rem;
+}
+.-top-0\.5 {
+  top: -0.125rem;
+}
+.bottom-0 {
+  bottom: 0px;
+}
+.bottom-3 {
+  bottom: 0.75rem;
+}
+.left-0 {
+  left: 0px;
+}
+.left-0\.5 {
+  left: 0.125rem;
+}
+.left-1 {
+  left: 0.25rem;
+}
+.left-3 {
+  left: 0.75rem;
+}
+.left-\[-9999px\] {
+  left: -9999px;
+}
+.right-0 {
+  right: 0px;
+}
+.right-1 {
+  right: 0.25rem;
+}
+.top-0 {
+  top: 0px;
+}
+.top-1\/2 {
+  top: 50%;
+}
+.z-10 {
+  z-index: 10;
+}
+.z-50 {
+  z-index: 50;
+}
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+.mb-1\.5 {
+  margin-bottom: 0.375rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+.mr-4 {
+  margin-right: 1rem;
+}
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 0.75rem;
+}
+.flex {
+  display: flex;
+}
+.hidden {
+  display: none;
+}
+.h-12 {
+  height: 3rem;
+}
+.h-2 {
+  height: 0.5rem;
+}
+.h-2\.5 {
+  height: 0.625rem;
+}
+.h-3 {
+  height: 0.75rem;
+}
+.h-48 {
+  height: 12rem;
+}
+.h-52 {
+  height: 13rem;
+}
+.h-6 {
+  height: 1.5rem;
+}
+.h-7 {
+  height: 1.75rem;
+}
+.h-9 {
+  height: 2.25rem;
+}
+.h-full {
+  height: 100%;
+}
+.h-screen {
+  height: 100vh;
+}
+.w-10 {
+  width: 2.5rem;
+}
+.w-14 {
+  width: 3.5rem;
+}
+.w-2\.5 {
+  width: 0.625rem;
+}
+.w-3 {
+  width: 0.75rem;
+}
+.w-32 {
+  width: 8rem;
+}
+.w-56 {
+  width: 14rem;
+}
+.w-72 {
+  width: 18rem;
+}
+.w-\[480px\] {
+  width: 480px;
+}
+.w-\[560px\] {
+  width: 560px;
+}
+.w-full {
+  width: 100%;
+}
+.w-px {
+  width: 1px;
+}
+.max-w-\[140px\] {
+  max-width: 140px;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
+.shrink-0 {
+  flex-shrink: 0;
+}
+.-translate-x-1\/2 {
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.-translate-y-1\/2 {
+  --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.rotate-45 {
+  --tw-rotate: 45deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.cursor-ew-resize {
+  cursor: ew-resize;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.resize-none {
+  resize: none;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-0\.5 {
+  gap: 0.125rem;
+}
+.gap-1 {
+  gap: 0.25rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-x-auto {
+  overflow-x: auto;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rounded {
+  border-radius: 0.25rem;
+}
+.rounded-full {
+  border-radius: 9999px;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.rounded-md {
+  border-radius: 0.375rem;
+}
+.border {
+  border-width: 1px;
+}
+.border-0 {
+  border-width: 0px;
+}
+.border-b {
+  border-bottom-width: 1px;
+}
+.border-l {
+  border-left-width: 1px;
+}
+.border-r {
+  border-right-width: 1px;
+}
+.border-t {
+  border-top-width: 1px;
+}
+.border-\[\#9aa3b8\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(154 163 184 / var(--tw-border-opacity));
+}
+.border-accent {
+  --tw-border-opacity: 1;
+  border-color: rgb(91 140 255 / var(--tw-border-opacity));
+}
+.border-edge {
+  --tw-border-opacity: 1;
+  border-color: rgb(46 56 80 / var(--tw-border-opacity));
+}
+.border-edge\/30 {
+  border-color: rgb(46 56 80 / 0.3);
+}
+.border-edge\/40 {
+  border-color: rgb(46 56 80 / 0.4);
+}
+.border-edge\/50 {
+  border-color: rgb(46 56 80 / 0.5);
+}
+.border-transparent {
+  border-color: transparent;
+}
+.bg-\[\#0d1018\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(13 16 24 / var(--tw-bg-opacity));
+}
+.bg-accent {
+  --tw-bg-opacity: 1;
+  background-color: rgb(91 140 255 / var(--tw-bg-opacity));
+}
+.bg-accent\/20 {
+  background-color: rgb(91 140 255 / 0.2);
+}
+.bg-black\/60 {
+  background-color: rgb(0 0 0 / 0.6);
+}
+.bg-black\/70 {
+  background-color: rgb(0 0 0 / 0.7);
+}
+.bg-edge {
+  --tw-bg-opacity: 1;
+  background-color: rgb(46 56 80 / var(--tw-bg-opacity));
+}
+.bg-ink {
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 21 31 / var(--tw-bg-opacity));
+}
+.bg-panel {
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 32 48 / var(--tw-bg-opacity));
+}
+.bg-panel\/90 {
+  background-color: rgb(26 32 48 / 0.9);
+}
+.bg-panel2 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 42 61 / var(--tw-bg-opacity));
+}
+.bg-red-500\/10 {
+  background-color: rgb(239 68 68 / 0.1);
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.bg-warn {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 180 84 / var(--tw-bg-opacity));
+}
+.p-0\.5 {
+  padding: 0.125rem;
+}
+.p-1 {
+  padding: 0.25rem;
+}
+.p-1\.5 {
+  padding: 0.375rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+.p-3 {
+  padding: 0.75rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+.px-1\.5 {
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.py-1\.5 {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+.text-center {
+  text-align: center;
+}
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.text-\[10px\] {
+  font-size: 10px;
+}
+.text-\[11px\] {
+  font-size: 11px;
+}
+.text-\[9px\] {
+  font-size: 9px;
+}
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.leading-\[22px\] {
+  line-height: 22px;
+}
+.text-\[\#9aa3b8\] {
+  --tw-text-opacity: 1;
+  color: rgb(154 163 184 / var(--tw-text-opacity));
+}
+.text-\[\#e6e9f2\] {
+  --tw-text-opacity: 1;
+  color: rgb(230 233 242 / var(--tw-text-opacity));
+}
+.text-accent {
+  --tw-text-opacity: 1;
+  color: rgb(91 140 255 / var(--tw-text-opacity));
+}
+.text-red-400 {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+.opacity-60 {
+  opacity: 0.6;
+}
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.outline-none {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.ring-2 {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+.ring-accent\/30 {
+  --tw-ring-color: rgb(91 140 255 / 0.3);
+}
+.blur {
+  --tw-blur: blur(8px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: #0d1018;
+  color: #e6e9f2;
+  overflow: hidden;
+  font-size: 13px;
+}
+* { box-sizing: border-box; }
+input, select { color-scheme: dark; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #2e3850; border-radius: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+.hover\:border-edge:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(46 56 80 / var(--tw-border-opacity));
+}
+.hover\:bg-accent:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(91 140 255 / var(--tw-bg-opacity));
+}
+.hover\:bg-accent\/30:hover {
+  background-color: rgb(91 140 255 / 0.3);
+}
+.hover\:bg-accent\/90:hover {
+  background-color: rgb(91 140 255 / 0.9);
+}
+.hover\:bg-edge:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(46 56 80 / var(--tw-bg-opacity));
+}
+.hover\:bg-panel:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(26 32 48 / var(--tw-bg-opacity));
+}
+.hover\:bg-panel2:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 42 61 / var(--tw-bg-opacity));
+}
+.hover\:bg-panel2\/50:hover {
+  background-color: rgb(34 42 61 / 0.5);
+}
+.hover\:bg-red-500\/20:hover {
+  background-color: rgb(239 68 68 / 0.2);
+}
+.focus\:border-accent:focus {
+  --tw-border-opacity: 1;
+  border-color: rgb(91 140 255 / var(--tw-border-opacity));
+}
+.disabled\:opacity-30:disabled {
+  opacity: 0.3;
+}
+.disabled\:opacity-50:disabled {
+  opacity: 0.5;
+}
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+@media (min-width: 640px) {
+
+  .sm\:inline {
+    display: inline;
+  }
+}
+</style></head>
+  <body>
+    <div id="root"><div class="flex flex-col h-screen overflow-hidden bg-ink text-[#e6e9f2]"><header class="h-12 flex items-center px-3 border-b border-edge bg-panel shrink-0 gap-2"><div class="flex items-center gap-2 mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles text-accent"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg><input class="bg-transparent font-semibold text-sm w-32 outline-none border-b border-transparent hover:border-edge focus:border-accent px-1" value="未命名动画"></div><div class="flex items-center gap-1 bg-panel2 rounded-lg p-1"><button title="选择" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs bg-accent text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mouse-pointer2"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"></path></svg><span class="hidden sm:inline">选择</span></button><button title="矩形" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square"><rect width="18" height="18" x="3" y="3" rx="2"></rect></svg><span class="hidden sm:inline">矩形</span></button><button title="椭圆" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle"><circle cx="12" cy="12" r="10"></circle></svg><span class="hidden sm:inline">椭圆</span></button><button title="直线" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"></path></svg><span class="hidden sm:inline">直线</span></button><button title="箭头" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><span class="hidden sm:inline">箭头</span></button><button title="文本" class="p-1.5 rounded-md transition-colors flex items-center gap-1 text-xs hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-type"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" x2="15" y1="20" y2="20"></line><line x1="12" x2="12" y1="4" y2="20"></line></svg><span class="hidden sm:inline">文本</span></button></div><div class="flex-1"></div><div class="flex items-center gap-1"><button title="新建" class="p-1.5 hover:bg-panel2 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-plus"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M9 15h6"></path><path d="M12 18v-6"></path></svg></button><button title="示例" class="p-1.5 hover:bg-panel2 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg></button><button title="撤销" disabled="" class="p-1.5 hover:bg-panel2 rounded-md disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo2"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"></path></svg></button><button title="重做" disabled="" class="p-1.5 hover:bg-panel2 rounded-md disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo2"><path d="m15 14 5-5-5-5"></path><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"></path></svg></button></div><div class="w-px h-6 bg-edge mx-1"></div><div class="flex items-center gap-1"><button title="保存 JSON" class="p-1.5 hover:bg-panel2 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path><path d="M7 3v4a1 1 0 0 0 1 1h7"></path></svg></button><button title="打开 JSON" class="p-1.5 hover:bg-panel2 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg></button><input type="file" accept=".json,.anicanvas.json" class="hidden"><button title="导入 DSL" class="p-1.5 hover:bg-panel2 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-xml"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg></button><button title="导出视频" class="p-1.5 hover:bg-panel2 rounded-md text-accent"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="m9 8 6 4-6 4Z"></path></svg></button></div></header><div class="flex flex-1 overflow-hidden"><div class="w-56 flex flex-col border-r border-edge bg-panel shrink-0"><div class="h-9 flex items-center px-3 border-b border-edge text-xs font-semibold text-[#9aa3b8]">图层</div><div class="flex-1 overflow-y-auto py-1"><div class="group flex flex-col px-2 py-1.5 border-b border-edge/50 cursor-pointer hover:bg-panel2"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-type text-[#9aa3b8] shrink-0"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" x2="15" y1="20" y2="20"></line><line x1="12" x2="12" y1="4" y2="20"></line></svg><span class="flex-1 text-xs truncate select-none">标题</span></div><div class="flex items-center justify-end gap-0.5 mt-1 opacity-60 group-hover:opacity-100"><button title="上移" disabled="" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"></path></svg></button><button title="下移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg></button><button title="隐藏" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button title="锁定" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg></button><button title="复制" class="p-0.5 rounded hover:bg-panel text-xs px-1">+</button><button title="删除" class="p-0.5 rounded hover:bg-red-500/20 text-red-400 text-xs px-1">×</button></div></div><div class="group flex flex-col px-2 py-1.5 border-b border-edge/50 cursor-pointer hover:bg-panel2"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square text-[#9aa3b8] shrink-0"><rect width="18" height="18" x="3" y="3" rx="2"></rect></svg><span class="flex-1 text-xs truncate select-none">Tool</span></div><div class="flex items-center justify-end gap-0.5 mt-1 opacity-60 group-hover:opacity-100"><button title="上移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"></path></svg></button><button title="下移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg></button><button title="隐藏" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button title="锁定" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg></button><button title="复制" class="p-0.5 rounded hover:bg-panel text-xs px-1">+</button><button title="删除" class="p-0.5 rounded hover:bg-red-500/20 text-red-400 text-xs px-1">×</button></div></div><div class="group flex flex-col px-2 py-1.5 border-b border-edge/50 cursor-pointer hover:bg-panel2"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right text-[#9aa3b8] shrink-0"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><span class="flex-1 text-xs truncate select-none">调用</span></div><div class="flex items-center justify-end gap-0.5 mt-1 opacity-60 group-hover:opacity-100"><button title="上移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"></path></svg></button><button title="下移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg></button><button title="隐藏" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button title="锁定" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg></button><button title="复制" class="p-0.5 rounded hover:bg-panel text-xs px-1">+</button><button title="删除" class="p-0.5 rounded hover:bg-red-500/20 text-red-400 text-xs px-1">×</button></div></div><div class="group flex flex-col px-2 py-1.5 border-b border-edge/50 cursor-pointer hover:bg-panel2"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square text-[#9aa3b8] shrink-0"><rect width="18" height="18" x="3" y="3" rx="2"></rect></svg><span class="flex-1 text-xs truncate select-none">Agent</span></div><div class="flex items-center justify-end gap-0.5 mt-1 opacity-60 group-hover:opacity-100"><button title="上移" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"></path></svg></button><button title="下移" disabled="" class="p-0.5 rounded hover:bg-panel disabled:opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"></path></svg></button><button title="隐藏" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><button title="锁定" class="p-0.5 rounded hover:bg-panel"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg></button><button title="复制" class="p-0.5 rounded hover:bg-panel text-xs px-1">+</button><button title="删除" class="p-0.5 rounded hover:bg-red-500/20 text-red-400 text-xs px-1">×</button></div></div></div></div><div class="flex-1 relative bg-[#0d1018] overflow-hidden"><div class="absolute inset-0 flex items-center justify-center"><div><div class="konvajs-content" role="presentation" style="position: relative; user-select: none; width: 768px; height: 544px;"><canvas width="768" height="544" style="padding: 0px; margin: 0px; border: 0px; background: transparent; position: absolute; top: 0px; left: 0px; width: 768px; height: 544px; display: block;"></canvas></div></div></div></div><div class="w-72 flex flex-col border-l border-edge bg-panel shrink-0"><div class="h-9 flex items-center px-3 border-b border-edge text-xs font-semibold text-[#9aa3b8]">属性</div><div class="flex-1 flex items-center justify-center text-xs text-[#9aa3b8]">未选择对象</div></div></div><div class="h-52 flex flex-col border-t border-edge bg-panel shrink-0"><div class="h-9 flex items-center px-3 border-b border-edge gap-2 shrink-0"><button class="p-1 hover:bg-panel2 rounded"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-skip-back"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" x2="5" y1="19" y2="5"></line></svg></button><button class="p-1 hover:bg-panel2 rounded text-accent"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></button><button class="p-1 hover:bg-panel2 rounded"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-skip-forward"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" x2="19" y1="5" y2="19"></line></svg></button><button class="p-1 rounded text-accent bg-accent/20" title="循环"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-repeat"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></button><button disabled="" class="p-1 hover:bg-panel2 rounded disabled:opacity-30" title="上一关键帧"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6"></path></svg></button><button disabled="" class="p-1 hover:bg-panel2 rounded disabled:opacity-30" title="下一关键帧"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg></button><div class="flex-1"></div><div class="text-xs font-mono text-[#9aa3b8]">000 / 150 @ 30fps</div></div><div class="flex-1 overflow-x-auto overflow-y-hidden relative"><div class="absolute inset-y-0 left-0" style="width: 1860px;"><div class="absolute top-0 left-0 right-0 border-b border-edge" style="height: 36px;"><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 0px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">0</div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 12px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 24px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 36px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 48px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 60px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 72px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 84px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 96px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 108px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 120px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 132px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 144px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 156px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 168px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 180px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 192px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 204px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 216px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 228px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 240px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 252px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 264px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 276px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 288px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 300px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 312px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 324px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 336px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 348px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 360px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">30</div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 372px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 384px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 396px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 408px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 420px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 432px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 444px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 456px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 468px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 480px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 492px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 504px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 516px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 528px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 540px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 552px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 564px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 576px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 588px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 600px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 612px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 624px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 636px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 648px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 660px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 672px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 684px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 696px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 708px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 720px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">60</div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 732px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 744px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 756px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 768px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 780px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 792px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 804px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 816px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 828px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 840px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 852px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 864px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 876px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 888px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 900px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 912px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 924px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 936px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 948px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 960px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 972px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 984px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 996px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1008px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1020px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1032px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1044px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1056px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1068px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1080px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">90</div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1092px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1104px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1116px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1128px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1140px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1152px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1164px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1176px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1188px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1200px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1212px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1224px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1236px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1248px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1260px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1272px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1284px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1296px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1308px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1320px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1332px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1344px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1356px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1368px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1380px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1392px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1404px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1416px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1428px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1440px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">120</div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1452px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1464px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1476px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1488px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1500px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1512px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1524px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1536px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1548px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1560px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1572px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1584px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1596px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1608px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1620px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1632px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1644px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1656px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1668px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1680px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1692px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1704px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1716px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1728px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1740px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none " style="transform: translateY(-50%); bottom: 50%;"></div></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1752px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1764px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1776px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1788px;"></div><div class="absolute top-0 bottom-0 border-l border-edge/40" style="left: 1800px;"><div class="absolute left-0.5 bottom-0 text-[9px] text-[#9aa3b8] select-none font-semibold" style="transform: translateY(-50%); bottom: 50%;">150</div></div></div><div class="absolute left-0 right-0" style="top: 36px;"><div style="transform: translateY(0px);"><div class="text-[10px] text-[#9aa3b8] px-1 truncate select-none">Agent</div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 14px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">X</span><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 0px; top: 25px;"></div><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 300px; top: 25px;"></div><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border bg-accent border-accent" title="删除当前关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 36px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 58px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">旋转</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 80px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放X</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 102px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 124px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">不透明度</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div></div><div style="transform: translateY(136px);"><div class="text-[10px] text-[#9aa3b8] px-1 truncate select-none">调用</div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 14px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">X</span><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 480px; top: 25px;"></div><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 720px; top: 25px;"></div><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 36px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 58px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">旋转</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 80px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放X</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 102px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 124px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">不透明度</span><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 480px; top: 135px;"></div><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 720px; top: 135px;"></div><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div></div><div style="transform: translateY(272px);"><div class="text-[10px] text-[#9aa3b8] px-1 truncate select-none">Tool</div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 14px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">X</span><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 240px; top: 25px;"></div><div class="absolute w-2.5 h-2.5 rounded-full -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 bg-warn hover:bg-accent" style="left: 540px; top: 25px;"></div><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 36px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 58px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">旋转</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 80px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放X</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 102px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 124px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">不透明度</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div></div><div style="transform: translateY(408px);"><div class="text-[10px] text-[#9aa3b8] px-1 truncate select-none">标题</div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 14px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">X</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 36px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 58px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">旋转</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 80px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放X</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 102px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">缩放Y</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div><div class="absolute left-0 right-0 border-b border-edge/30 hover:bg-panel2/50" style="top: 124px; height: 22px;"><span class="absolute left-1 text-[9px] text-[#9aa3b8] leading-[22px] select-none">不透明度</span><button class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border border-[#9aa3b8] hover:bg-accent/30" title="添加关键帧"></button></div></div></div><div class="absolute top-0 bottom-0 w-px bg-accent z-10 cursor-ew-resize" style="left: 0px;"><div class="absolute -top-0.5 -left-1.5 w-3 h-3 bg-accent rotate-45"></div></div></div></div></div></div></div>
+    <script type="module" src="/src/main.tsx?t=1783347634383"></script>
+  
+
+</body></html>
