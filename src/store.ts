@@ -63,6 +63,7 @@ interface EditorState {
   importProjectJSON: (json: string) => boolean
   exportProjectJSON: () => string
   importDSL: (text: string) => boolean
+  applyDSL: (text: string) => boolean
   applyScene: (sc: Scene) => void
 }
 
@@ -263,6 +264,16 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       const sc = parseDSL(text)
       if (!sc) return false
       set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [] })
+      return true
+    } catch {
+      return false
+    }
+  },
+  applyDSL: (text) => {
+    try {
+      const sc = parseDSL(text)
+      if (!sc) return false
+      get().applyScene(sc)
       return true
     } catch {
       return false

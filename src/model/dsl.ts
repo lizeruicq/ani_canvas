@@ -9,6 +9,104 @@ import { createNode, createScene } from './defaults'
 //  keyframe Agent.x @0 = -260 [back]
 //  keyframe Agent.x @25 = 180 [linear]
 
+const ANIMATABLE_PROPS: AnimatableProp[] = ['x', 'y', 'rotation', 'scaleX', 'scaleY', 'opacity']
+
+function quoteIfNeeded(v: string): string {
+  if (v === '') return '""'
+  if (/[\s"=]/.test(v)) return `"${v.replace(/"/g, '\\"')}"`
+  return v
+}
+
+function sanitizeName(name: string, used: Set<string>): string {
+  let base = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_一-龥]/g, '_') || 'node'
+  if (!used.has(base)) return base
+  let i = 1
+  while (used.has(`${base}_${i}`)) i += 1
+  return `${base}_${i}`
+}
+
+function fmt(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toString()
+}
+
+export function exportDSL(scene: Scene): string {
+  const lines: string[] = []
+  const used = new Set<string>()
+  const nameMap = new Map<SceneNode, string>()
+
+  lines.push('# Scene')
+  const sceneParts = [
+    `name=${quoteIfNeeded(scene.name)}`,
+    `fps=${scene.fps}`,
+    `duration=${scene.duration}`,
+    `width=${scene.width}`,
+    `height=${scene.height}`,
+    `bg=${scene.background}`,
+  ]
+  lines.push(`scene ${sceneParts.join(' ')}`)
+  lines.push('')
+
+  if (scene.nodes.length > 0) {
+    lines.push('# Nodes')
+    for (const node of scene.nodes) {
+      const safe = sanitizeName(node.name, used)
+      used.add(safe)
+      nameMap.set(node, safe)
+
+      const parts: string[] = [`name=${quoteIfNeeded(safe)}`]
+      parts.push(`x=${fmt(node.x)}`)
+      parts.push(`y=${fmt(node.y)}`)
+      parts.push(`rotation=${fmt(node.rotation)}`)
+      parts.push(`opacity=${fmt(node.opacity)}`)
+      parts.push(`visible=${node.visible ? 1 : 0}`)
+      parts.push(`locked=${node.locked ? 1 : 0}`)
+
+      if (node.type === 'rect' || node.type === 'ellipse') {
+        parts.push(`w=${fmt(node.width)}`)
+        parts.push(`h=${fmt(node.height)}`)
+      }
+      parts.push(`fill=${quoteIfNeeded(node.fill)}`)
+      if (node.stroke !== '') parts.push(`stroke=${quoteIfNeeded(node.stroke)}`)
+      parts.push(`thick=${fmt(node.strokeWidth)}`)
+      if (node.type === 'rect') parts.push(`radius=${fmt(node.cornerRadius)}`)
+
+      if (node.type === 'text') {
+        parts.push(`text=${quoteIfNeeded(node.text)}`)
+        parts.push(`size=${fmt(node.fontSize)}`)
+      }
+      if ((node.type === 'line' || node.type === 'arrow') && node.points.length > 0) {
+        parts.push(`points=${node.points.map(fmt).join(',')}`)
+      }
+      if (node.type === 'path') {
+        parts.push(`path=${quoteIfNeeded(node.pathData)}`)
+      }
+
+      lines.push(`${node.type} ${parts.join(' ')}`)
+    }
+    lines.push('')
+  }
+
+  const kfLines: string[] = []
+  for (const node of scene.nodes) {
+    const target = nameMap.get(node)
+    if (!target) continue
+    for (const prop of ANIMATABLE_PROPS) {
+      const kfs = node.keyframes[prop]
+      if (!kfs || kfs.length === 0) continue
+      for (const kf of kfs) {
+        kfLines.push(`keyframe ${target}.${prop} @${kf.frame} = ${fmt(kf.value)} [${kf.easing}]`)
+      }
+    }
+  }
+  if (kfLines.length > 0) {
+    lines.push('# Keyframes')
+    lines.push(...kfLines)
+    lines.push('')
+  }
+
+  return lines.join('\n').trimEnd() + '\n'
+}
+
 function tokenize(line: string): string[] {
   const tokens: string[] = []
   let cur = ''
@@ -97,8 +195,11 @@ export function parseDSL(text: string): Scene | null {
       if (kv.size) node.fontSize = +kv.size
       if (kv.text) node.text = kv.text
       if (kv.points) node.points = kv.points.split(',').map((n) => +n)
+      if (kv.path) node.pathData = kv.path
       if (kv.rotation) node.rotation = +kv.rotation
       if (kv.opacity != null) node.opacity = Math.max(0, Math.min(1, +kv.opacity))
+      if (kv.visible != null) node.visible = kv.visible === '1' || kv.visible.toLowerCase() === 'true'
+      if (kv.locked != null) node.locked = kv.locked === '1' || kv.locked.toLowerCase() === 'true'
       node.name = kv.name ?? node.name
       nodeIndex[node.name] = node
       scene.nodes.push(node)
