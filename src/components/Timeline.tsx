@@ -12,7 +12,7 @@ const HEADER_HEIGHT = 32
 
 export default function Timeline() {
   const {
-    scene, currentFrame, playing, loop, autoKey, selectedId,
+    scene, currentFrame, playing, loop, autoKey, selectedIds,
     setCurrentFrame, setPlaying, toggleLoop, toggleAutoKey, selectNode,
     addKeyframe, removeKeyframe, moveKeyframe,
   } = useEditor()
@@ -121,8 +121,9 @@ export default function Timeline() {
   }, [dragging, scene.duration, frameWidth])
 
   const jumpKeyframe = (dir: -1 | 1) => {
-    if (!selectedId) return
-    const node = scene.nodes.find((n) => n.id === selectedId)
+    if (selectedIds.length === 0) return
+    const firstId = selectedIds[0]
+    const node = scene.nodes.find((n) => n.id === firstId)
     if (!node) return
     const frames = new Set<number>()
     Object.values(node.keyframes).forEach((arr) => arr?.forEach((k) => frames.add(k.frame)))
@@ -171,8 +172,8 @@ export default function Timeline() {
           {autoKey && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-danger animate-pulse" />}
         </button>
         <div className="w-px h-5 bg-edge mx-1" />
-        <button onClick={() => jumpKeyframe(-1)} disabled={!selectedId} title="上一关键帧" className="icon-btn disabled:opacity-30"><ChevronLeft size={15} /></button>
-        <button onClick={() => jumpKeyframe(1)} disabled={!selectedId} title="下一关键帧" className="icon-btn disabled:opacity-30"><ChevronRight size={15} /></button>
+        <button onClick={() => jumpKeyframe(-1)} disabled={selectedIds.length === 0} title="上一关键帧" className="icon-btn disabled:opacity-30"><ChevronLeft size={15} /></button>
+        <button onClick={() => jumpKeyframe(1)} disabled={selectedIds.length === 0} title="下一关键帧" className="icon-btn disabled:opacity-30"><ChevronRight size={15} /></button>
         <div className="flex-1" />
         {autoKey && <span className="text-[10px] text-danger font-semibold uppercase tracking-wider mr-2">自动关键</span>}
         <div className="text-xs font-mono text-muted tabular-nums">
@@ -212,10 +213,10 @@ export default function Timeline() {
                 <div key={node.id} className="border-b border-edge/40">
                   <div
                     className="relative h-7 flex items-center gap-1.5 px-2 cursor-pointer hover:bg-panel2/50"
-                    style={{ background: selectedId === node.id ? 'rgba(79,124,255,0.12)' : undefined }}
+                    style={{ background: selectedIds.includes(node.id) ? 'rgba(79,124,255,0.12)' : undefined }}
                     onClick={(e) => {
                       e.stopPropagation()
-                      if (selectedId === node.id) toggleCollapse(node.id)
+                      if (selectedIds.includes(node.id) && selectedIds.length === 1) toggleCollapse(node.id)
                       else { selectNode(node.id); setCollapsed((prev) => prev.has(node.id) ? (() => { const n = new Set(prev); n.delete(node.id); return n })() : prev) }
                     }}
                   >

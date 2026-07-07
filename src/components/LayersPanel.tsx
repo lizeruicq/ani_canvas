@@ -12,7 +12,7 @@ const ICONS: Record<NodeType, React.ElementType> = {
 
 export default function LayersPanel({ width }: { width: number }) {
   const {
-    scene, selectedId, selectNode, reorderNode,
+    scene, selectedIds, selectNode, selectNodes, clearSelection, reorderNode,
     toggleVisible, toggleLock, renameNode, duplicateNode, deleteNode,
   } = useEditor()
 
@@ -29,8 +29,11 @@ export default function LayersPanel({ width }: { width: number }) {
             <LayerRow
               key={node.id}
               node={node}
-              selected={selectedId === node.id}
-              onSelect={() => selectNode(node.id)}
+              selected={selectedIds.includes(node.id)}
+              onSelect={(e) => {
+                const shift = e && (e as any).shiftKey
+                selectNode(node.id, shift)
+              }}
               onToggleVisible={() => toggleVisible(node.id)}
               onToggleLock={() => toggleLock(node.id)}
               onMoveUp={() => reorderNode(node.id, 1)}
@@ -54,7 +57,7 @@ export default function LayersPanel({ width }: { width: number }) {
 interface LayerRowProps {
   node: import('../types').SceneNode
   selected: boolean
-  onSelect: () => void
+  onSelect: (e?: any) => void
   onToggleVisible: () => void
   onToggleLock: () => void
   onMoveUp: () => void
@@ -76,7 +79,7 @@ function LayerRow(props: LayerRowProps) {
 
   return (
     <div
-      onClick={onSelect}
+      onClick={(e) => onSelect(e)}
       className={[
         'group flex flex-col px-2 py-1.5 border-b border-edge/40 cursor-pointer transition-colors',
         selected ? 'bg-accent/15' : 'hover:bg-panel2/50',

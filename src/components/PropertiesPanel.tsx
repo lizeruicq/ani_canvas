@@ -8,12 +8,12 @@ import CodeEditor from './CodeEditor'
 export default function PropertiesPanel({ width }: { width: number }) {
   const [tab, setTab] = useState<'props' | 'code'>('props')
   const {
-    scene, selectedId, currentFrame, beginTouch, liveSet, liveStyle,
+    scene, selectedIds, currentFrame, beginTouch, liveSet, liveStyle,
     addKeyframe, removeKeyframe, addKeyframeAll, deleteNode, duplicateNode,
     setKeyframeEasing,
   } = useEditor()
 
-  const node = scene.nodes.find((n) => n.id === selectedId)
+  const node = selectedIds.length === 1 ? scene.nodes.find((n) => n.id === selectedIds[0]) : null
   const eff = node ? effectiveProps(node, currentFrame) : null
 
   const num = (label: string, prop: AnimatableProp, step = 1, min?: number, max?: number) => {
@@ -137,8 +137,17 @@ export default function PropertiesPanel({ width }: { width: number }) {
         </div>
       )}
 
-      {tab === 'props' && !node && (
+      {tab === 'props' && !node && selectedIds.length === 0 && (
         <div className="flex-1 grid place-items-center text-xs text-muted">未选择对象</div>
+      )}
+
+      {tab === 'props' && !node && selectedIds.length > 1 && (
+        <div className="flex-1 grid place-items-center text-xs text-muted text-center px-4">
+          <div>
+            <div className="mb-1">已选择 {selectedIds.length} 个对象</div>
+            <div className="text-[10px] text-muted/70">选择单个对象以编辑属性</div>
+          </div>
+        </div>
       )}
 
       {tab === 'props' && node && (

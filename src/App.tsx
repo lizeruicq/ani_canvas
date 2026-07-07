@@ -10,7 +10,7 @@ import { useEditor } from './store'
 
 export default function App() {
   const {
-    selectedId, deleteNode, setPlaying, setCurrentFrame,
+    selectedIds, deleteSelectedNodes, setPlaying, setCurrentFrame,
     undo, redo, setTool, selectNode, toggleAutoKey,
   } = useEditor()
   const [layersW, setLayersW] = useState(244)
@@ -38,7 +38,7 @@ export default function App() {
       switch (e.key) {
         case 'Delete':
         case 'Backspace':
-          if (selectedId) { e.preventDefault(); deleteNode(selectedId) }
+          if (selectedIds.length > 0) { e.preventDefault(); deleteSelectedNodes() }
           break
         case ' ':
           e.preventDefault()
@@ -72,7 +72,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selectedId, deleteNode, setPlaying, setCurrentFrame, undo, redo, setTool, selectNode, toggleAutoKey])
+  }, [selectedIds, deleteSelectedNodes, setPlaying, setCurrentFrame, undo, redo, setTool, selectNode, toggleAutoKey])
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-ink text-text">

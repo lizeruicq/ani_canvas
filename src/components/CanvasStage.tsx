@@ -13,12 +13,18 @@ export default function CanvasStage() {
   const [size, setSize] = useState({ w: 0, h: 0 })
 
   const {
-    scene, currentFrame, selectedId, tool, playing, selectNode,
-    beginTouch, liveSet, addNode,
+    scene, currentFrame, selectedIds, tool, playing,
+    selectNode, selectNodes, clearSelection,
+    beginTouch, liveSet, liveSetMany, addNode,
   } = useEditor()
 
   const transformerRef = useRef<Konva.Transformer | null>(null)
-  const selectedRef = useRef<Konva.Node | null>(null)
+  const nodeRefs = useRef<Map<string, Konva.Node>>(new Map())
+
+  // 筐选状态
+  const [marquee, setMarquee] = useState<{ start: Pt; end: Pt } | null>(null)
+  // 多选拖拽时记录每个节点的初始位置
+  const dragStartPositions = useRef<Map<string, { x: number; y: number }>>(new Map())
 
   useEffect(() => {
     const el = wrapperRef.current
@@ -39,17 +45,21 @@ export default function CanvasStage() {
   const offsetX = (size.w - stageW) / 2
   const offsetY = (size.h - stageH) / 2
 
+  // 更新 Transformer 绑定的节点
   useEffect(() => {
     const tr = transformerRef.current
     if (!tr) return
-    if (selectedRef.current && tool === 'select' && !playing) {
-      tr.nodes([selectedRef.current])
-      tr.getLayer()?.batchDraw()
-    } else {
-      tr.nodes([])
-      tr.getLayer()?.batchDraw()
+    if (tool === 'select' && !playing && selectedIds.length === 1) {
+      const node = nodeRefs.current.get(selectedIds[0])
+      if (node) {
+        tr.nodes([node])
+        tr.getLayer()?.batchDraw()
+        return
+      }
     }
-  }, [selectedId, tool, scene.nodes, currentFrame, playing])
+    tr.nodes([])
+    tr.getLayer()?.batchDraw()
+  }, [selectedIds, tool, scene.nodes, currentFrame, playing])
 
   const [drawing, setDrawing] = useState<{
     type: NodeType
@@ -67,9 +77,42 @@ export default function CanvasStage() {
     }
   }
 
+  // 检查节点是否与矩形相交
+  const nodeIntersects = (node: SceneNode, rect: { x: number; y: number; w: number; h: number }): boolean => {
+    const eff = effectiveProps(node, currentFrame)
+    let nx = eff.x, ny = eff.y
+    let nw = node.width, nh = node.height
+
+    if (node.type === 'line' || node.type === 'arrow') {
+      if (node.points.length < 4) return false
+      const xs = node.points.filter((_, i) => i % 2 === 0)
+      const ys = node.points.filter((_, i) => i % 2 === 1)
+      const minX = Math.min(...xs), maxX = Math.max(...xs)
+      const minY = Math.min(...ys), maxY = Math.max(...ys)
+      nw = maxX - minX
+      nh = maxY - minY
+    }
+
+    if (node.type === 'text') {
+      nw = node.text.length * node.fontSize * 0.6
+      nh = node.fontSize * 1.2
+    }
+
+    return (
+      nx < rect.x + rect.w &&
+      nx + nw > rect.x &&
+      ny < rect.y + rect.h &&
+      ny + nh > rect.y
+    )
+  }
+
   const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (tool === 'select') {
-      if (e.target === e.target.getStage()) selectNode(null)
+      // 点击空白处
+      if (e.target === e.target.getStage()) {
+        const pos = toStage(e.evt.clientX, e.evt.clientY)
+        setMarquee({ start: pos, end: pos })
+      }
       return
     }
     const pos = toStage(e.evt.clientX, e.evt.clientY)
@@ -77,6 +120,11 @@ export default function CanvasStage() {
   }
 
   const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    if (marquee) {
+      const pos = toStage(e.evt.clientX, e.evt.clientY)
+      setMarquee({ ...marquee, end: pos })
+      return
+    }
     if (!drawing) return
     const pos = toStage(e.evt.clientX, e.evt.clientY)
     if (drawing.type === 'path') {
@@ -87,6 +135,31 @@ export default function CanvasStage() {
   }
 
   const handleStageMouseUp = () => {
+    if (marquee) {
+      const x = Math.min(marquee.start.x, marquee.end.x)
+      const y = Math.min(marquee.start.y, marquee.end.y)
+      const w = Math.abs(marquee.end.x - marquee.start.x)
+      const h = Math.abs(marquee.end.y - marquee.start.y)
+      setMarquee(null)
+
+      // 如果筐选范围太小，视为点击空白处，取消选择
+      if (w < 3 || h < 3) {
+        clearSelection()
+        return
+      }
+
+      // 选中所有相交的节点
+      const hitIds = scene.nodes
+        .filter(n => !n.locked && n.visible && nodeIntersects(n, { x, y, w, h }))
+        .map(n => n.id)
+      if (hitIds.length > 0) {
+        selectNodes(hitIds)
+      } else {
+        clearSelection()
+      }
+      return
+    }
+
     if (!drawing) return
     const { type, start, current, points } = drawing
     setDrawing(null)
@@ -123,15 +196,76 @@ export default function CanvasStage() {
   const handleNodeMouseDown = (node: SceneNode, e: Konva.KonvaEventObject<MouseEvent>) => {
     if (tool !== 'select' || node.locked) return
     e.cancelBubble = true
-    selectNode(node.id)
+
+    const shiftKey = e.evt.shiftKey
+    const isAlreadySelected = selectedIds.includes(node.id)
+
+    if (shiftKey) {
+      // Shift+点击：切换选择
+      if (isAlreadySelected) {
+        if (selectedIds.length > 1) {
+          selectNodes(selectedIds.filter(id => id !== node.id))
+        }
+      } else {
+        selectNodes([...selectedIds, node.id])
+      }
+    } else if (!isAlreadySelected) {
+      // 点击未选中的节点：只选这个
+      selectNode(node.id)
+    }
+    // 如果已选中且非 Shift，保持当前选择，准备拖拽
+
+    // 记录所有选中节点的初始位置
+    const ids = shiftKey ? (isAlreadySelected ? selectedIds : [...selectedIds, node.id]) : (isAlreadySelected ? selectedIds : [node.id])
+    dragStartPositions.current.clear()
+    ids.forEach(id => {
+      const n = scene.nodes.find(x => x.id === id)
+      if (n) {
+        const eff = effectiveProps(n, currentFrame)
+        dragStartPositions.current.set(id, { x: eff.x, y: eff.y })
+      }
+    })
   }
 
   const handleDragStart = () => beginTouch()
+
   const handleDragEnd = (node: SceneNode, e: Konva.KonvaEventObject<DragEvent>) => {
     const k = e.target
-    liveSet(node.id, 'x', k.x())
-    liveSet(node.id, 'y', k.y())
+    const newX = k.x()
+    const newY = k.y()
+    const startPos = dragStartPositions.current.get(node.id)
+
+    if (selectedIds.length > 1 && selectedIds.includes(node.id) && startPos) {
+      // 多选拖拽：计算位移量，应用到所有选中节点
+      const dx = newX - startPos.x
+      const dy = newY - startPos.y
+
+      const otherIds = selectedIds.filter(id => id !== node.id)
+      const xs = otherIds.map(id => {
+        const sp = dragStartPositions.current.get(id)
+        return (sp?.x ?? 0) + dx
+      })
+      const ys = otherIds.map(id => {
+        const sp = dragStartPositions.current.get(id)
+        return (sp?.y ?? 0) + dy
+      })
+
+      // 先更新其他节点
+      if (otherIds.length > 0) {
+        liveSetMany(otherIds, 'x', xs)
+        liveSetMany(otherIds, 'y', ys)
+      }
+      // 再更新拖拽的节点
+      liveSet(node.id, 'x', newX)
+      liveSet(node.id, 'y', newY)
+    } else {
+      liveSet(node.id, 'x', newX)
+      liveSet(node.id, 'y', newY)
+    }
+
+    dragStartPositions.current.clear()
   }
+
   const handleTransformStart = () => beginTouch()
   const handleTransformEnd = (node: SceneNode, e: Konva.KonvaEventObject<MouseEvent>) => {
     const k = e.target
@@ -168,6 +302,14 @@ export default function CanvasStage() {
 
   const canDrag = tool === 'select'
 
+  // 筐选框的坐标
+  const marqueeRect = marquee ? {
+    x: Math.min(marquee.start.x, marquee.end.x),
+    y: Math.min(marquee.start.y, marquee.end.y),
+    w: Math.abs(marquee.end.x - marquee.start.x),
+    h: Math.abs(marquee.end.y - marquee.start.y),
+  } : null
+
   return (
     <div ref={wrapperRef} className="canvas-backdrop absolute inset-0 flex items-center justify-center">
       {size.w === 0 || size.h === 0 ? (
@@ -179,7 +321,7 @@ export default function CanvasStage() {
           onMouseDown={handleStageMouseDown}
           onMouseMove={handleStageMouseMove}
           onMouseUp={handleStageMouseUp}
-          onMouseLeave={() => setDrawing(null)}
+          onMouseLeave={() => { setDrawing(null); setMarquee(null) }}
         >
           <Layer x={offsetX} y={offsetY} scaleX={scale} scaleY={scale}>
             <Rect
@@ -197,12 +339,16 @@ export default function CanvasStage() {
 
             {scene.nodes.map((node) => {
               const eff = effectiveProps(node, currentFrame)
+              const isSelected = selectedIds.includes(node.id)
               return (
                 <NodeRenderer
                   key={node.id}
                   node={node}
                   eff={eff}
-                  nodeRef={selectedId === node.id ? (ref) => { selectedRef.current = ref } : undefined}
+                  nodeRef={(ref) => {
+                    if (ref) nodeRefs.current.set(node.id, ref)
+                    else nodeRefs.current.delete(node.id)
+                  }}
                   onMouseDown={(e) => handleNodeMouseDown(node, e)}
                   onDragStart={canDrag ? handleDragStart : undefined}
                   onDragEnd={canDrag ? (e) => handleDragEnd(node, e) : undefined}
@@ -214,9 +360,56 @@ export default function CanvasStage() {
 
             {previewNode && <NodeRenderer node={previewNode} eff={effectiveProps(previewNode, currentFrame)} />}
 
+            {/* 多选高亮框 */}
+            {selectedIds.length > 1 && scene.nodes.map(node => {
+              if (!selectedIds.includes(node.id)) return null
+              const eff = effectiveProps(node, currentFrame)
+              let w = node.width, h = node.height
+              if (node.type === 'line' || node.type === 'arrow') {
+                if (node.points.length >= 4) {
+                  const xs = node.points.filter((_, i) => i % 2 === 0)
+                  const ys = node.points.filter((_, i) => i % 2 === 1)
+                  w = Math.max(...xs) - Math.min(...xs)
+                  h = Math.max(...ys) - Math.min(...ys)
+                }
+              }
+              if (node.type === 'text') {
+                w = node.text.length * node.fontSize * 0.6
+                h = node.fontSize * 1.2
+              }
+              return (
+                <Rect
+                  key={`sel-${node.id}`}
+                  x={eff.x}
+                  y={eff.y}
+                  width={w}
+                  height={h}
+                  stroke="#4f7cff"
+                  strokeWidth={1 / scale}
+                  dash={[4 / scale, 2 / scale]}
+                  listening={false}
+                />
+              )
+            })}
+
+            {/* 筐选框 */}
+            {marqueeRect && (
+              <Rect
+                x={marqueeRect.x}
+                y={marqueeRect.y}
+                width={marqueeRect.w}
+                height={marqueeRect.h}
+                fill="rgba(79, 124, 255, 0.12)"
+                stroke="#4f7cff"
+                strokeWidth={1 / scale}
+                dash={[4 / scale, 2 / scale]}
+                listening={false}
+              />
+            )}
+
             <Transformer
               ref={transformerRef}
-              visible={tool === 'select' && !!selectedId && !playing}
+              visible={tool === 'select' && selectedIds.length === 1 && !playing}
               rotateAnchorOffset={24}
               anchorSize={8}
               anchorCornerRadius={2}
@@ -233,6 +426,12 @@ export default function CanvasStage() {
         <span>{scene.width}×{scene.height}</span>
         <span className="text-edge2">·</span>
         <span>{Math.round(scale * 100)}%</span>
+        {selectedIds.length > 1 && (
+          <>
+            <span className="text-edge2">·</span>
+            <span className="text-accent">已选 {selectedIds.length} 个</span>
+          </>
+        )}
       </div>
 
       {tool !== 'select' && (
@@ -240,10 +439,15 @@ export default function CanvasStage() {
           {tool === 'text' ? '点击画布添加文本' : tool === 'path' ? '拖拽自由绘制' : '拖拽绘制形状'}
         </div>
       )}
+
+      {tool === 'select' && selectedIds.length === 0 && (
+        <div className="absolute bottom-3 left-3 bg-panel1/80 border border-edge rounded-md px-2 py-1 text-xs text-muted pointer-events-none">
+          拖拽空白处筐选 · Shift+点击多选
+        </div>
+      )}
     </div>
   )
 }
-
 function createPreviewBase(type: NodeType): Partial<SceneNode> {
   return {
     id: 'preview', name: '预览', type, visible: true, locked: true,
