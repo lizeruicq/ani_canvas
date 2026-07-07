@@ -5,7 +5,8 @@ import {
 import { useEditor } from '../store'
 import { ANIMATABLE_PROPS, PROP_LABEL, AnimatableProp } from '../types'
 
-const FRAME_WIDTH = 12
+const MIN_FRAME_WIDTH = 6
+const MAX_FRAME_WIDTH = 40
 const TRACK_HEIGHT = 22
 const HEADER_HEIGHT = 32
 
@@ -21,8 +22,27 @@ export default function Timeline() {
   const [dragKf, setDragKf] = useState<{ nodeId: string; prop: AnimatableProp; frame: number } | null>(null)
   const [th, setTh] = useState(236)
   const [resizing, setResizing] = useState(false)
+  const [frameWidth, setFrameWidth] = useState(12)
   // 折叠集合:不在集合中 = 展开。默认全部展开,这样关键帧直接可见
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
+
+  // 根据容器宽度和总帧数动态计算每帧宽度
+  useEffect(() => {
+    const updateFrameWidth = () => {
+      if (!containerRef.current) return
+      const containerWidth = containerRef.current.clientWidth
+      // 计算目标宽度，确保至少有一定的最小宽度
+      const targetWidth = Math.max(
+        MIN_FRAME_WIDTH,
+        Math.min(MAX_FRAME_WIDTH, containerWidth / (scene.duration + 10))
+      )
+      setFrameWidth(targetWidth)
+    }
+
+    updateFrameWidth()
+    window.addEventListener('resize', updateFrameWidth)
+    return () => window.removeEventListener('resize', updateFrameWidth)
+  }, [scene.duration])
 
   const toggleCollapse = (id: string) =>
     setCollapsed((prev) => {
@@ -71,8 +91,8 @@ export default function Timeline() {
     }
   }, [resizing])
 
-  const frameToX = (f: number) => f * FRAME_WIDTH
-  const xToFrame = (x: number) => Math.max(0, Math.min(scene.duration, Math.round(x / FRAME_WIDTH)))
+  const frameToX = (f: number) => f * frameWidth
+  const xToFrame = (x: number) => Math.max(0, Math.min(scene.duration, Math.round(x / frameWidth)))
 
   const handleTrackClick = (e: React.MouseEvent) => {
     if (dragging) return
@@ -98,7 +118,7 @@ export default function Timeline() {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
-  }, [dragging, scene.duration])
+  }, [dragging, scene.duration, frameWidth])
 
   const jumpKeyframe = (dir: -1 | 1) => {
     if (!selectedId) return
@@ -116,7 +136,7 @@ export default function Timeline() {
     }
   }
 
-  const totalWidth = (scene.duration + 5) * FRAME_WIDTH
+  const totalWidth = (scene.duration + 10) * frameWidth
 
   return (
     <div className="flex flex-col border-t border-edge bg-panel1 shrink-0" style={{ height: th }}>
@@ -168,12 +188,17 @@ export default function Timeline() {
           {/* Ruler (sticky) */}
           <div className="sticky top-0 z-10 border-b border-edge bg-panel1/95 backdrop-blur" style={{ height: HEADER_HEIGHT }}>
             {Array.from({ length: scene.duration + 1 }, (_, f) => f).map((f) => {
-              const major = f % 30 === 0
-              const minor = f % 5 === 0
+              // 根据当前 frameWidth 动态调整刻度密度
+              let majorInterval = 30
+              let minorInterval = 5
+              if (frameWidth < 8) { majorInterval = 60; minorInterval = 10 }
+              if (frameWidth > 20) { majorInterval = 10; minorInterval = 5 }
+              const major = f % majorInterval === 0
+              const minor = f % minorInterval === 0
               return (
                 <div key={f} className="absolute top-0 bottom-0" style={{ left: frameToX(f) }}>
                   <div className={['absolute bottom-0 w-px', major ? 'h-3 bg-edge2' : minor ? 'h-2 bg-edge' : 'h-1 bg-edge/60'].join(' ')} />
-                  {major && <div className="absolute bottom-2.5 left-1 text-[9px] text-muted tabular-nums select-none">{f}</div>}
+                  {major && frameWidth >= 6 && <div className="absolute bottom-2.5 left-1 text-[9px] text-muted tabular-nums select-none">{f}</div>}
                 </div>
               )
             })}
@@ -249,6 +274,8 @@ export default function Timeline() {
       {dragging === 'kf' && dragKf && (
         <DragGhost
           containerRef={containerRef}
+          frameWidth={frameWidth}
+          duration={scene.duration}
           onCommit={(frame) => { if (frame !== dragKf.frame) moveKeyframe(dragKf.nodeId, dragKf.prop, dragKf.frame, frame) }}
         />
       )}
@@ -276,10 +303,11 @@ function KeyframeDot(props: {
   )
 }
 
-function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; onCommit: (frame: number) => void }) {
-  const { containerRef, onCommit } = props
+function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; frameWidth: number; duration: number; onCommit: (frame: number) => void }) {
+  const { containerRef, frameWidth, duration, onCommit } = props
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
   useEffect(() => {
+    const xToFrame = (x: number) => Math.max(0, Math.min(duration, Math.round(x / frameWidth)))
     const onMove = (e: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
@@ -289,7 +317,7 @@ function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; onCom
       const rect = containerRef.current?.getBoundingClientRect()
       if (rect) {
         const x = e.clientX - rect.left + (containerRef.current?.scrollLeft ?? 0)
-        onCommit(Math.max(0, Math.round(x / FRAME_WIDTH)))
+        onCommit(xToFrame(x))
       }
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
@@ -297,7 +325,7 @@ function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; onCom
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
-  }, [])
+  }, [frameWidth, duration])
   if (!pos) return null
   return <div className="fixed w-2.5 h-2.5 rotate-45 rounded-[1px] bg-accent pointer-events-none z-50" style={{ left: pos.x, top: pos.y, transform: 'translate(-50%, -50%) rotate(45deg)' }} />
 }
