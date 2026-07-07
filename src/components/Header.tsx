@@ -2,9 +2,13 @@ import { useRef, useState } from 'react'
 import {
   MousePointer2, Square, Circle, Minus, ArrowRight, Type, PenTool,
   Undo2, Redo2, Save, FolderOpen, Code2, PlaySquare, Sparkles, FilePlus,
+  Bot, MessagesSquare,
 } from 'lucide-react'
 import { useEditor, Tool } from '../store'
+import { useLLM } from '../llm/store'
 import VideoExportModal from './VideoExportModal'
+import LLMConfigModal from './LLMConfigModal'
+import LLMChatModal from './LLMChatModal'
 
 const TOOLS: { id: Tool; label: string; icon: React.ElementType; key: string }[] = [
   { id: 'select', label: '选择', icon: MousePointer2, key: '1' },
@@ -25,6 +29,9 @@ export default function Header() {
   const [dslOpen, setDslOpen] = useState(false)
   const [dslText, setDslText] = useState('')
   const [videoOpen, setVideoOpen] = useState(false)
+  const connected = useLLM((s) => s.connected)
+  const [llmConfigOpen, setLlmConfigOpen] = useState(false)
+  const [llmChatOpen, setLlmChatOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSave = () => {
@@ -104,6 +111,16 @@ export default function Header() {
           <button title="打开 JSON" onClick={() => fileInputRef.current?.click()} className="icon-btn"><FolderOpen size={16} /></button>
           <button title="导入 DSL" onClick={() => setDslOpen(true)} className="icon-btn"><Code2 size={16} /></button>
           <button title="导出视频" onClick={() => setVideoOpen(true)} className="icon-btn text-accent"><PlaySquare size={16} /></button>
+          <div className="w-px h-5 bg-edge mx-1" />
+          <button title="大模型配置" onClick={() => setLlmConfigOpen(true)} className="icon-btn relative">
+            <Bot size={16} />
+            <span className={['absolute top-1 right-1 w-1.5 h-1.5 rounded-full', connected ? 'bg-ok' : 'bg-muted/40'].join(' ')} />
+          </button>
+          {connected && (
+            <button title="AI 对话生成动画" onClick={() => setLlmChatOpen(true)} className="icon-btn text-accent">
+              <MessagesSquare size={16} />
+            </button>
+          )}
           <input ref={fileInputRef} type="file" accept=".json,.anicanvas.json" onChange={handleLoad} className="hidden" />
         </div>
       </header>
@@ -127,6 +144,9 @@ export default function Header() {
       )}
 
       {videoOpen && <VideoExportModal onClose={() => setVideoOpen(false)} />}
+
+      {llmConfigOpen && <LLMConfigModal onClose={() => setLlmConfigOpen(false)} />}
+      {llmChatOpen && <LLMChatModal onClose={() => setLlmChatOpen(false)} />}
     </>
   )
 }

@@ -63,6 +63,7 @@ interface EditorState {
   importProjectJSON: (json: string) => boolean
   exportProjectJSON: () => string
   importDSL: (text: string) => boolean
+  applyScene: (sc: Scene) => void
 }
 
 function snapshot(state: { scene: Scene; past: Scene[]; future: Scene[] }) {
@@ -267,4 +268,10 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       return false
     }
   },
+  applyScene: (sc) => set((s) => {
+    snapshot(s)
+    s.scene = sc
+    s.selectedId = null
+    s.currentFrame = 0
+  }),
 })))
