@@ -68,23 +68,23 @@ rect name=胶水4 x=1027.782608695652 y=427.78268996580306 rotation=0 opacity=1 
 text name=胶水4文 x=1032.782608695652 y=450.78268996580306 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=工具 size=17
 rect name=左腿 x=340 y=490 rotation=0 opacity=1 visible=1 locked=0 w=65 h=120 fill=#d8cfc1 stroke=#c7bda8 thick=9 radius=15
 rect name=右腿 x=440 y=490 rotation=0 opacity=1 visible=1 locked=0 w=65 h=120 fill=#d8cfc1 stroke=#c7bda8 thick=9 radius=15
-rect name=左膝亮 x=355 y=490 rotation=0 opacity=1 visible=1 locked=0 w=35 h=15 fill=#7209b7 stroke=#1a2233 thick=0 radius=8
-rect name=右膝亮 x=455 y=490 rotation=0 opacity=1 visible=1 locked=0 w=35 h=15 fill=#7209b7 stroke=#1a2233 thick=0 radius=8
+rect name=左膝亮 x=355 y=490 rotation=0 opacity=1 visible=1 locked=0 w=35 h=15 fill=#c77dff stroke=#1a2233 thick=0 radius=8
+rect name=右膝亮 x=455 y=490 rotation=0 opacity=1 visible=1 locked=0 w=35 h=15 fill=#c77dff stroke=#1a2233 thick=0 radius=8
 ellipse name=左脚 x=372 y=610 rotation=0 opacity=1 visible=1 locked=0 w=90 h=40 fill=#c7bda8 stroke=#a89880 thick=7
 ellipse name=右脚 x=472 y=610 rotation=0 opacity=1 visible=1 locked=0 w=90 h=40 fill=#c7bda8 stroke=#a89880 thick=7
-rect name=左脚亮 x=345 y=595 rotation=0 opacity=1 visible=1 locked=0 w=50 h=10 fill=#7209b7 stroke=#1a2233 thick=0 radius=5
-rect name=右脚亮 x=445 y=595 rotation=0 opacity=1 visible=1 locked=0 w=50 h=10 fill=#7209b7 stroke=#1a2233 thick=0 radius=5
+rect name=左脚亮 x=345 y=595 rotation=0 opacity=1 visible=1 locked=0 w=50 h=10 fill=#c77dff stroke=#1a2233 thick=0 radius=5
+rect name=右脚亮 x=445 y=595 rotation=0 opacity=1 visible=1 locked=0 w=50 h=10 fill=#c77dff stroke=#1a2233 thick=0 radius=5
 rect name=身体 x=310 y=300 rotation=0 opacity=1 visible=1 locked=0 w=230 h=190 fill=#e8e2d7 stroke=#c7bda8 thick=10 radius=20
-rect name=身体上亮 x=340 y=310 rotation=0 opacity=1 visible=1 locked=0 w=170 h=20 fill=#7209b7 stroke=#1a2233 thick=0 radius=10
-ellipse name=胸口外 x=425 y=360 rotation=0 opacity=1 visible=1 locked=0 w=80 h=80 fill=#c7bda8 stroke=#7209b7 thick=9
-ellipse name=胸口内 x=425 y=360 rotation=0 opacity=1 visible=1 locked=0 w=50 h=50 fill=#7209b7 stroke=#480ca8 thick=7
+rect name=身体上亮 x=340 y=310 rotation=0 opacity=1 visible=1 locked=0 w=170 h=20 fill=#c77dff stroke=#1a2233 thick=0 radius=10
+ellipse name=胸口外 x=425 y=360 rotation=0 opacity=1 visible=1 locked=0 w=80 h=80 fill=#c7bda8 stroke=#9d4edd thick=9
+ellipse name=胸口内 x=425 y=360 rotation=0 opacity=1 visible=1 locked=0 w=50 h=50 fill=#c77dff stroke=#9d4edd thick=7
 ellipse name=胸口亮 x=425 y=360 rotation=0 opacity=1 visible=1 locked=0 w=25 h=25 fill=#fff stroke=#1a2233 thick=0
-ellipse name=胸口光 x=425 y=360 rotation=0 opacity=0.4 visible=1 locked=0 w=70 h=70 fill=#7209b7 stroke=#1a2233 thick=0
+ellipse name=胸口光 x=425 y=360 rotation=0 opacity=0.4 visible=1 locked=0 w=70 h=70 fill=#c77dff stroke=#1a2233 thick=0
 rect name=头 x=390 y=220 rotation=0 opacity=1 visible=1 locked=0 w=110 h=80 fill=#e8e2d7 stroke=#c7bda8 thick=10 radius=18
-rect name=头天线 x=440 y=190 rotation=0 opacity=1 visible=1 locked=0 w=10 h=35 fill=#7209b7 stroke=#480ca8 thick=5 radius=18
-ellipse name=天线顶 x=445 y=190 rotation=0 opacity=1 visible=1 locked=0 w=20 h=20 fill=#7209b7 stroke=#480ca8 thick=6
+rect name=头天线 x=440 y=190 rotation=0 opacity=1 visible=1 locked=0 w=10 h=35 fill=#c77dff stroke=#9d4edd thick=5 radius=18
+ellipse name=天线顶 x=445 y=190 rotation=0 opacity=1 visible=1 locked=0 w=20 h=20 fill=#c77dff stroke=#9d4edd thick=6
 ellipse name=左眼罩 x=400 y=250 rotation=0 opacity=1 visible=1 locked=0 w=40 h=30 fill=#53d5fd stroke=#c7bda8 thick=7
-ellipse name=右眼罩 x=480 y=250 rotation=0 opacity=1 visible=1 locked=0 w=40 h=30 fill=#d8cfc1 stroke=#c7bda8 thick=7
+ellipse name=右眼罩 x=480 y=250 rotation=0 opacity=1 visible=1 locked=0 w=40 h=30 fill=#53d5fd stroke=#c7bda8 thick=7
 ellipse name=左眼光 x=400 y=250 rotation=0 opacity=1 visible=1 locked=0 w=30 h=20 fill=#53d5fd stroke=#53d5fd thick=5
 ellipse name=右眼光 x=480 y=250 rotation=0 opacity=1 visible=1 locked=0 w=30 h=20 fill=#53d5fd stroke=#53d5fd thick=5
 ellipse name=左眼光亮 x=393 y=244 rotation=0 opacity=1 visible=1 locked=0 w=10 h=7 fill=#fff stroke=#1a2233 thick=0
@@ -106,6 +106,14 @@ rect name=提示移1 x=805 y=335 rotation=0 opacity=1 visible=1 locked=0 w=70 h=
 text name=提示移1文 x=815 y=348 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=提示 size=18
 ellipse name=模型移1 x=850 y=260 rotation=0 opacity=1 visible=1 locked=0 w=55 h=45 fill=#bde0fe stroke=#7209b7 thick=6
 text name=模型移1文 x=825 y=255 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=OpenAI size=16
+rect name=胶水移2 x=885 y=425 rotation=0 opacity=1 visible=1 locked=0 w=55 h=50 fill=#fff0e6 stroke=#ffd6ff thick=6 radius=10
+text name=胶水移2文 x=890 y=448 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=拼接 size=17
+rect name=API移2 x=890 y=155 rotation=0 opacity=1 visible=1 locked=0 w=60 h=40 fill=#c77dff stroke=#7209b7 thick=6 radius=6
+text name=API移2文 x=895 y=170 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=SQL size=19
+rect name=提示移2 x=885 y=335 rotation=0 opacity=1 visible=1 locked=0 w=70 h=40 fill=#fff9d6 stroke=#ffd166 thick=6 radius=18
+text name=提示移2文 x=895 y=348 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=模板 size=18
+ellipse name=模型移2 x=920 y=260 rotation=0 opacity=1 visible=1 locked=0 w=55 h=45 fill=#caffbf stroke=#7209b7 thick=6
+text name=模型移2文 x=895 y=255 rotation=0 opacity=1 visible=1 locked=0 fill=#3a3530 stroke=#1a2233 thick=5 text=Claude size=16
 
 # Keyframes
 keyframe 胶水移1.x @0 = 815 [linear]
@@ -156,3 +164,51 @@ keyframe 模型移1文.x @180 = 420 [linear]
 keyframe 模型移1文.y @0 = 255 [linear]
 keyframe 模型移1文.y @45 = 170 [linear]
 keyframe 模型移1文.y @180 = 170 [linear]
+keyframe 胶水移2.x @50 = 885 [linear]
+keyframe 胶水移2.x @95 = 450 [linear]
+keyframe 胶水移2.x @180 = 450 [linear]
+keyframe 胶水移2.y @50 = 425 [linear]
+keyframe 胶水移2.y @95 = 500 [linear]
+keyframe 胶水移2.y @180 = 500 [linear]
+keyframe 胶水移2文.x @50 = 890 [linear]
+keyframe 胶水移2文.x @95 = 455 [linear]
+keyframe 胶水移2文.x @180 = 455 [linear]
+keyframe 胶水移2文.y @50 = 448 [linear]
+keyframe 胶水移2文.y @95 = 523 [linear]
+keyframe 胶水移2文.y @180 = 523 [linear]
+keyframe API移2.x @50 = 890 [linear]
+keyframe API移2.x @95 = 345 [linear]
+keyframe API移2.x @180 = 345 [linear]
+keyframe API移2.y @50 = 155 [linear]
+keyframe API移2.y @95 = 500 [linear]
+keyframe API移2.y @180 = 500 [linear]
+keyframe API移2文.x @50 = 895 [linear]
+keyframe API移2文.x @95 = 350 [linear]
+keyframe API移2文.x @180 = 350 [linear]
+keyframe API移2文.y @50 = 170 [linear]
+keyframe API移2文.y @95 = 515 [linear]
+keyframe API移2文.y @180 = 515 [linear]
+keyframe 提示移2.x @50 = 885 [linear]
+keyframe 提示移2.x @95 = 425 [linear]
+keyframe 提示移2.x @180 = 425 [linear]
+keyframe 提示移2.y @50 = 335 [linear]
+keyframe 提示移2.y @95 = 445 [linear]
+keyframe 提示移2.y @180 = 445 [linear]
+keyframe 提示移2文.x @50 = 895 [linear]
+keyframe 提示移2文.x @95 = 435 [linear]
+keyframe 提示移2文.x @180 = 435 [linear]
+keyframe 提示移2文.y @50 = 348 [linear]
+keyframe 提示移2文.y @95 = 458 [linear]
+keyframe 提示移2文.y @180 = 458 [linear]
+keyframe 模型移2.x @50 = 920 [linear]
+keyframe 模型移2.x @95 = 445 [linear]
+keyframe 模型移2.x @180 = 445 [linear]
+keyframe 模型移2.y @50 = 260 [linear]
+keyframe 模型移2.y @95 = 420 [linear]
+keyframe 模型移2.y @180 = 420 [linear]
+keyframe 模型移2文.x @50 = 895 [linear]
+keyframe 模型移2文.x @95 = 420 [linear]
+keyframe 模型移2文.x @180 = 420 [linear]
+keyframe 模型移2文.y @50 = 255 [linear]
+keyframe 模型移2文.y @95 = 415 [linear]
+keyframe 模型移2文.y @180 = 415 [linear]
