@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   MousePointer2, Square, Circle, Minus, ArrowRight, Type, PenTool,
   Undo2, Redo2, Save, FolderOpen, Code2, PlaySquare, Sparkles, FilePlus,
-  Bot, MessagesSquare,
+  Bot, MessagesSquare, HardDriveDownload, Upload, CheckCircle2, CircleDashed,
+  RefreshCw, Database, Link, Link2Off
 } from 'lucide-react'
 import { useEditor, Tool } from '../store'
 import { useLLM } from '../llm/store'
@@ -23,41 +24,62 @@ const TOOLS: { id: Tool; label: string; icon: React.ElementType; key: string }[]
 export default function Header() {
   const {
     scene, tool, setTool, undo, redo, past, future, setName,
-    newScene, loadDemo, exportProjectJSON, importProjectJSON, importDSL,
+    newScene, loadDemo, isDirty, saveToLocalStorage, exportToFile, importFromFile,
+    importDSL, fileSyncEnabled, setFileSyncEnabled, loadFromSceneFile, saveToSceneFile,
+    syncingToFile
   } = useEditor()
 
   const [dslOpen, setDslOpen] = useState(false)
   const [dslText, setDslText] = useState('')
   const [videoOpen, setVideoOpen] = useState(false)
+  const [showSaveIndicator, setShowSaveIndicator] = useState(false)
   const connected = useLLM((s) => s.connected)
   const [llmConfigOpen, setLlmConfigOpen] = useState(false)
   const [llmChatOpen, setLlmChatOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleSave = () => {
-    const blob = new Blob([exportProjectJSON()], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${scene.name || 'project'}.anicanvas.json`
-    a.click()
-    URL.revokeObjectURL(url)
+  // 显示保存指示器
+  useEffect(() => {
+    if (isDirty) {
+      setShowSaveIndicator(true)
+    }
+  }, [isDirty])
+
+  const handleSaveNow = () => {
+    saveToLocalStorage()
+    if (fileSyncEnabled) {
+      saveToSceneFile()
+    }
+    setShowSaveIndicator(false)
+  }
+
+  const handleExport = () => {
+    exportToFile()
   }
 
   const handleLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (!importProjectJSON(String(reader.result))) alert('项目文件格式错误')
-    }
-    reader.readAsText(file)
+    importFromFile(file).then((success) => {
+      if (!success) alert('项目文件格式错误')
+    })
     e.target.value = ''
   }
 
   const handleImportDSL = () => {
-    if (importDSL(dslText)) { setDslOpen(false); setDslText('') }
-    else alert('DSL 解析失败')
+    if (importDSL(dslText)) { 
+      setDslOpen(false)
+      setDslText('')
+    } else {
+      alert('DSL 解析失败')
+    }
+  }
+
+  const toggleFileSync = () => {
+    setFileSyncEnabled(!fileSyncEnabled)
+    if (!fileSyncEnabled) {
+      loadFromSceneFile()
+    }
   }
 
   return (
@@ -73,6 +95,56 @@ export default function Header() {
             onBlur={(e) => { const v = e.target.value.trim(); if (v) setName(v) }}
             onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
           />
+          <div className="flex items-center gap-1 ml-1">
+            {fileSyncEnabled && (
+              <button
+                onClick={toggleFileSync}
+                title="文件同步已开启 - 点击关闭"
+                className="flex items-center gap-1 text-[10px] text-ok hover:text-accent"
+              >
+                <Database size={10} />
+                <span>scenes/scene.dsl</span>
+              </button>
+            )}
+            {!fileSyncEnabled && (
+              <button
+                onClick={toggleFileSync}
+                title="文件同步已关闭 - 点击开启"
+                className="flex items-center gap-1 text-[10px] text-muted hover:text-accent"
+              >
+                <Link2Off size={10} />
+                <span>文件同步</span>
+              </button>
+            )}
+            {syncingToFile && (
+              <span className="flex items-center gap-1 text-[10px] text-accent">
+                <CircleDashed size={10} className="animate-spin" />
+                <span>同步中...</span>
+              </span>
+            )}
+            {showSaveIndicator && !syncingToFile && (
+              <button 
+                onClick={handleSaveNow}
+                title="点击立即保存 (自动保存会在1秒后执行)"
+                className="flex items-center gap-1 text-[10px] text-muted hover:text-accent"
+              >
+                <CircleDashed size={10} className="animate-spin" />
+                <span>未保存</span>
+              </button>
+            )}
+            {!isDirty && !syncingToFile && fileSyncEnabled && (
+              <div className="flex items-center gap-1 text-[10px] text-ok">
+                <CheckCircle2 size={10} />
+                <span>已同步</span>
+              </div>
+            )}
+            {!isDirty && !syncingToFile && !fileSyncEnabled && (
+              <div className="flex items-center gap-1 text-[10px] text-ok">
+                <CheckCircle2 size={10} />
+                <span>已保存</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-0.5 bg-ink/60 rounded-xl p-1 border border-edge">
@@ -101,14 +173,18 @@ export default function Header() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-0.5">
-          <button title="新建" onClick={newScene} className="icon-btn"><FilePlus size={16} /></button>
+          <button title="新建场景" onClick={newScene} className="icon-btn"><FilePlus size={16} /></button>
           <button title="加载示例" onClick={loadDemo} className="icon-btn"><Sparkles size={16} /></button>
           <div className="w-px h-5 bg-edge mx-1" />
           <button title="撤销 ⌘Z" onClick={undo} disabled={past.length === 0} className="icon-btn disabled:opacity-30"><Undo2 size={16} /></button>
           <button title="重做 ⌘⇧Z" onClick={redo} disabled={future.length === 0} className="icon-btn disabled:opacity-30"><Redo2 size={16} /></button>
           <div className="w-px h-5 bg-edge mx-1" />
-          <button title="保存 JSON" onClick={handleSave} className="icon-btn"><Save size={16} /></button>
-          <button title="打开 JSON" onClick={() => fileInputRef.current?.click()} className="icon-btn"><FolderOpen size={16} /></button>
+          <button title="立即保存" onClick={handleSaveNow} className={isDirty ? 'icon-btn text-accent' : 'icon-btn'}><Save size={16} /></button>
+          {fileSyncEnabled && (
+            <button title="从文件重新加载" onClick={loadFromSceneFile} className="icon-btn"><RefreshCw size={16} /></button>
+          )}
+          <button title="导出到 JSON 文件" onClick={handleExport} className="icon-btn"><HardDriveDownload size={16} /></button>
+          <button title="从 JSON 文件导入" onClick={() => fileInputRef.current?.click()} className="icon-btn"><Upload size={16} /></button>
           <button title="导入 DSL" onClick={() => setDslOpen(true)} className="icon-btn"><Code2 size={16} /></button>
           <button title="导出视频" onClick={() => setVideoOpen(true)} className="icon-btn text-accent"><PlaySquare size={16} /></button>
           <div className="w-px h-5 bg-edge mx-1" />

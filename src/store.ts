@@ -5,11 +5,30 @@ import {
 } from './types'
 import { createNode, createScene, createDemoScene, uid } from './model/defaults'
 import { effectiveProps } from './model/effective'
-import { parseDSL } from './model/dsl'
+import { parseDSL, exportDSL } from './model/dsl'
 
 export type Tool = 'select' | 'rect' | 'ellipse' | 'line' | 'arrow' | 'text' | 'path'
 
+const LOCAL_STORAGE_KEY = 'ani-canvas-scene'
+const AUTO_SAVE_DELAY = 1000
+
 const clone = (s: Scene): Scene => JSON.parse(JSON.stringify(s))
+
+// 尝试从 localStorage 加载场景
+const loadSavedScene = (): Scene => {
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (saved) {
+      const sc = JSON.parse(saved) as Scene
+      if (sc.nodes && sc.version) {
+        return sc
+      }
+    }
+  } catch {
+    // 忽略加载错误
+  }
+  return createDemoScene()
+}
 
 interface EditorState {
   scene: Scene
@@ -21,6 +40,9 @@ interface EditorState {
   tool: Tool
   past: Scene[]
   future: Scene[]
+  isDirty: boolean
+  fileSyncEnabled: boolean
+  syncingToFile: boolean
 
   setTool: (t: Tool) => void
   selectNode: (id: string | null) => void
@@ -65,6 +87,16 @@ interface EditorState {
   importDSL: (text: string) => boolean
   applyDSL: (text: string) => boolean
   applyScene: (sc: Scene) => void
+
+  saveToLocalStorage: () => void
+  loadFromLocalStorage: () => void
+  exportToFile: () => void
+  importFromFile: (file: File) => Promise<boolean>
+
+  // 文件同步功能
+  setFileSyncEnabled: (enabled: boolean) => void
+  loadFromSceneFile: () => Promise<boolean>
+  saveToSceneFile: () => Promise<boolean>
 }
 
 function snapshot(state: { scene: Scene; past: Scene[]; future: Scene[] }) {
@@ -89,8 +121,31 @@ function writeKeyframeAt(n: SceneNode, prop: AnimatableProp, frame: number, valu
   n.keyframes[prop] = kfs
 }
 
+let autoSaveTimer: NodeJS.Timeout | null = null
+let fileSaveTimer: NodeJS.Timeout | null = null
+
+const scheduleAutoSave = (get: () => EditorState) => {
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+  }
+  autoSaveTimer = setTimeout(() => {
+    get().saveToLocalStorage()
+  }, AUTO_SAVE_DELAY)
+}
+
+const scheduleFileSave = (get: () => EditorState) => {
+  if (fileSaveTimer) {
+    clearTimeout(fileSaveTimer)
+  }
+  fileSaveTimer = setTimeout(() => {
+    if (get().fileSyncEnabled) {
+      get().saveToSceneFile()
+    }
+  }, AUTO_SAVE_DELAY)
+}
+
 export const useEditor = create<EditorState>()(immer((set, get) => ({
-  scene: createDemoScene(),
+  scene: loadSavedScene(),
   selectedId: null,
   currentFrame: 0,
   playing: false,
@@ -99,6 +154,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
   tool: 'select',
   past: [],
   future: [],
+  isDirty: false,
+  fileSyncEnabled: true,
+  syncingToFile: false,
 
   setTool: (t) => set({ tool: t, selectedId: t === 'select' ? get().selectedId : null }),
   selectNode: (id) => set({ selectedId: id }),
@@ -107,28 +165,31 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
   setPlaying: (p) => set({ playing: p }),
   toggleLoop: () => set((s) => ({ loop: !s.loop })),
   toggleAutoKey: () => set((s) => ({ autoKey: !s.autoKey })),
-  setFps: (n) => set((s) => { snapshot(get()); s.scene.fps = Math.max(1, Math.round(n)) }),
-  setDuration: (n) => set((s) => { snapshot(get()); s.scene.duration = Math.max(1, Math.round(n)) }),
-  setBackground: (c) => set((s) => { snapshot(get()); s.scene.background = c }),
-  setName: (n) => set((s) => { snapshot(get()); s.scene.name = n }),
+  setFps: (n) => set((s) => { snapshot(get()); s.scene.fps = Math.max(1, Math.round(n)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
+  setDuration: (n) => set((s) => { snapshot(get()); s.scene.duration = Math.max(1, Math.round(n)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
+  setBackground: (c) => set((s) => { snapshot(get()); s.scene.background = c; s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
+  setName: (n) => set((s) => { snapshot(get()); s.scene.name = n; s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
 
   addNode: (type, partial) => {
     const node = createNode(type, partial)
-    set((s) => { snapshot(s); s.scene.nodes.push(node); s.selectedId = node.id })
+    set((s) => { snapshot(s); s.scene.nodes.push(node); s.selectedId = node.id; s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) })
     return node.id
   },
   addNodeAt: (type, x, y) => {
     const node = createNode(type, { x, y })
-    set((s) => { snapshot(s); s.scene.nodes.push(node); s.selectedId = node.id })
+    set((s) => { snapshot(s); s.scene.nodes.push(node); s.selectedId = node.id; s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) })
     return node.id
   },
   updateNode: (id, partial) =>
-    set((s) => { snapshot(s); withNode(s, id, (n) => Object.assign(n, partial)) }),
+    set((s) => { snapshot(s); withNode(s, id, (n) => Object.assign(n, partial)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
   deleteNode: (id) =>
     set((s) => {
       snapshot(s)
       s.scene.nodes = s.scene.nodes.filter((n) => n.id !== id)
       if (s.selectedId === id) s.selectedId = null
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   duplicateNode: (id) =>
     set((s) => {
@@ -142,6 +203,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       c.y = n.y + 24
       s.scene.nodes.push(c)
       s.selectedId = c.id
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   reorderNode: (id, dir) =>
     set((s) => {
@@ -152,13 +216,16 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       snapshot(s)
       const arr = s.scene.nodes
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   toggleVisible: (id) =>
-    set((s) => { snapshot(s); withNode(s, id, (n) => (n.visible = !n.visible)) }),
+    set((s) => { snapshot(s); withNode(s, id, (n) => (n.visible = !n.visible)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
   toggleLock: (id) =>
-    set((s) => { snapshot(s); withNode(s, id, (n) => (n.locked = !n.locked)) }),
+    set((s) => { snapshot(s); withNode(s, id, (n) => (n.locked = !n.locked)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
   renameNode: (id, name) =>
-    set((s) => { snapshot(s); withNode(s, id, (n) => (n.name = name)) }),
+    set((s) => { snapshot(s); withNode(s, id, (n) => (n.name = name)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
 
   beginTouch: () => set((s) => { snapshot(s) }),
   // autoKey 开启时,任何属性改动都在当前帧写关键帧;否则仅当轨道已存在时写关键帧
@@ -172,9 +239,12 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
           (n as any)[prop] = value
         }
       })
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   liveStyle: (id, partial) =>
-    set((s) => { withNode(s, id, (n) => Object.assign(n, partial)) }),
+    set((s) => { withNode(s, id, (n) => Object.assign(n, partial)); s.isDirty = true; scheduleAutoSave(get); scheduleFileSave(get) }),
 
   addKeyframe: (id, prop) =>
     set((s) => {
@@ -182,6 +252,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       if (!n) return
       snapshot(s)
       writeKeyframeAt(n, prop, s.currentFrame, effectiveProps(n, s.currentFrame)[prop])
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   addKeyframeAll: (id) =>
     set((s) => {
@@ -192,6 +265,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       ;(['x', 'y', 'rotation', 'scaleX', 'scaleY', 'opacity'] as AnimatableProp[]).forEach((p) =>
         writeKeyframeAt(n, p, s.currentFrame, eff[p]),
       )
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   removeKeyframe: (id, prop, frame) =>
     set((s) => {
@@ -200,6 +276,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       snapshot(s)
       n.keyframes[prop] = n.keyframes[prop]!.filter((k) => k.frame !== frame)
       if (n.keyframes[prop]!.length === 0) delete n.keyframes[prop]
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   moveKeyframe: (id, prop, fromFrame, toFrame) =>
     set((s) => {
@@ -210,6 +289,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       if (!k) return
       k.frame = Math.max(0, Math.round(toFrame))
       n.keyframes[prop]!.sort((a, b) => a.frame - b.frame)
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   setKeyframeEasing: (id, prop, frame, easing) =>
     set((s) => {
@@ -218,6 +300,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       snapshot(s)
       const k = n.keyframes[prop]!.find((x) => x.frame === frame)
       if (k) k.easing = easing
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   setKeyframeValue: (id, prop, frame, value) =>
     set((s) => {
@@ -226,6 +311,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       snapshot(s)
       const k = n.keyframes[prop]!.find((x) => x.frame === frame)
       if (k) k.value = value
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
 
   undo: () =>
@@ -235,6 +323,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       s.past = s.past.slice(0, -1)
       s.future = [clone(s.scene), ...s.future].slice(0, 60)
       s.scene = prev
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
   redo: () =>
     set((s) => {
@@ -243,16 +334,21 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
       s.future = s.future.slice(1)
       s.past = [...s.past, clone(s.scene)].slice(-60)
       s.scene = next
+      s.isDirty = true
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
     }),
 
-  loadScene: (sc) => set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [] }),
-  newScene: () => set({ scene: createScene(), selectedId: null, currentFrame: 0, past: [], future: [] }),
-  loadDemo: () => set({ scene: createDemoScene(), selectedId: null, currentFrame: 0, past: [], future: [] }),
+  loadScene: (sc) => set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true }),
+  newScene: () => set({ scene: createScene(), selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true }),
+  loadDemo: () => set({ scene: createDemoScene(), selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true }),
   importProjectJSON: (json) => {
     try {
       const sc = JSON.parse(json) as Scene
       if (!sc.nodes || !sc.version) return false
-      set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [] })
+      set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true })
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
       return true
     } catch {
       return false
@@ -263,7 +359,9 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
     try {
       const sc = parseDSL(text)
       if (!sc) return false
-      set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [] })
+      set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true })
+      scheduleAutoSave(get)
+      scheduleFileSave(get)
       return true
     } catch {
       return false
@@ -284,5 +382,103 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
     s.scene = sc
     s.selectedId = null
     s.currentFrame = 0
+    s.isDirty = true
+    scheduleAutoSave(get)
+    scheduleFileSave(get)
   }),
+
+  saveToLocalStorage: () => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(get().scene))
+      set({ isDirty: false })
+    } catch (e) {
+      console.error('Failed to save scene to localStorage:', e)
+    }
+  },
+
+  loadFromLocalStorage: () => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
+      if (saved) {
+        const sc = JSON.parse(saved) as Scene
+        if (sc.nodes && sc.version) {
+          set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: false })
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load scene from localStorage:', e)
+    }
+  },
+
+  exportToFile: () => {
+    const scene = get().scene
+    const dataStr = JSON.stringify(scene, null, 2)
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
+    const exportFileDefaultName = `${scene.name || 'scene'}.json`
+    
+    const linkElement = document.createElement('a')
+    linkElement.setAttribute('href', dataUri)
+    linkElement.setAttribute('download', exportFileDefaultName)
+    linkElement.click()
+  },
+
+  importFromFile: async (file: File): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string
+          const sc = JSON.parse(content) as Scene
+          if (sc.nodes && sc.version) {
+            set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: true })
+            scheduleAutoSave(get)
+            scheduleFileSave(get)
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        } catch {
+          resolve(false)
+        }
+      }
+      reader.onerror = () => resolve(false)
+      reader.readAsText(file)
+    })
+  },
+
+  setFileSyncEnabled: (enabled: boolean) => set({ fileSyncEnabled: enabled }),
+
+  loadFromSceneFile: async (): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/scene')
+      if (!response.ok) return false
+      const dslText = await response.text()
+      const sc = parseDSL(dslText)
+      if (!sc) return false
+      set({ scene: sc, selectedId: null, currentFrame: 0, past: [], future: [], isDirty: false })
+      return true
+    } catch (e) {
+      console.error('Failed to load from scene file:', e)
+      return false
+    }
+  },
+
+  saveToSceneFile: async (): Promise<boolean> => {
+    try {
+      set({ syncingToFile: true })
+      const dslText = exportDSL(get().scene)
+      const response = await fetch('/api/scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: dslText
+      })
+      if (!response.ok) return false
+      set({ isDirty: false, syncingToFile: false })
+      return true
+    } catch (e) {
+      console.error('Failed to save to scene file:', e)
+      set({ syncingToFile: false })
+      return false
+    }
+  }
 })))

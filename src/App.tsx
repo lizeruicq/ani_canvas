@@ -5,6 +5,7 @@ import CanvasStage from './components/CanvasStage'
 import PropertiesPanel from './components/PropertiesPanel'
 import Timeline from './components/Timeline'
 import Splitter from './components/Splitter'
+import FileWatcher from './components/FileWatcher'
 import { useEditor } from './store'
 
 export default function App() {
@@ -75,6 +76,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-ink text-text">
+      <FileWatcher />
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <LayersPanel width={layersW} />
