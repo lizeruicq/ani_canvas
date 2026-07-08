@@ -34,6 +34,7 @@ export function createNode(type: NodeType, partial: Partial<SceneNode> = {}): Sc
     x: 120, y: 120,
     rotation: 0, scaleX: 1, scaleY: 1, opacity: 1,
     width: 180, height: 120,
+    // 文本节点不需要固定宽高，由内容自动决定
     fill: nextColor(),
     stroke: '#1a2233',
     strokeWidth: 5,
@@ -67,7 +68,7 @@ export function createDemoScene(): Scene {
   scene.background = '#eef2f7'
 
   const title = createNode('text', {
-    name: '标题', x: 420, y: 80, width: 460, height: 60,
+    name: '标题', x: 420, y: 80,
     text: 'AniCanvas 动画演示', fontSize: 48, fill: '#1a2233',
   })
 

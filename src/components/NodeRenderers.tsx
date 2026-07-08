@@ -94,8 +94,6 @@ export default function NodeRenderer(props: NodeRendererProps) {
           text={node.text}
           fontSize={node.fontSize}
           fill={node.fill}
-          width={node.width || undefined}
-          height={node.height || undefined}
         />
       )
     case 'path':

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Play, Pause, SkipBack, SkipForward, Repeat, ChevronLeft, ChevronRight, CircleDot, GripHorizontal, ChevronDown, EyeOff,
+  Play, Pause, SkipBack, SkipForward, Repeat, ChevronLeft, ChevronRight,
+  CircleDot, GripHorizontal, ChevronDown, EyeOff, ChevronsDownUp, ChevronsUpDown,
 } from 'lucide-react'
 import { useEditor } from '../store'
 import { ANIMATABLE_PROPS, PROP_LABEL, AnimatableProp } from '../types'
@@ -23,22 +24,30 @@ export default function Timeline() {
   const [th, setTh] = useState(236)
   const [resizing, setResizing] = useState(false)
   const [frameWidth, setFrameWidth] = useState(12)
-  // 折叠集合:不在集合中 = 展开。默认全部展开,这样关键帧直接可见
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
+
+  const allExpanded = collapsed.size === 0
+  const allCollapsed = collapsed.size === scene.nodes.length
+
+  const toggleAll = () => {
+    if (allCollapsed) {
+      setCollapsed(new Set())
+    } else {
+      setCollapsed(new Set(scene.nodes.map(n => n.id)))
+    }
+  }
 
   // 根据容器宽度和总帧数动态计算每帧宽度
   useEffect(() => {
     const updateFrameWidth = () => {
       if (!containerRef.current) return
       const containerWidth = containerRef.current.clientWidth
-      // 计算目标宽度，确保至少有一定的最小宽度
       const targetWidth = Math.max(
         MIN_FRAME_WIDTH,
         Math.min(MAX_FRAME_WIDTH, containerWidth / (scene.duration + 10))
       )
       setFrameWidth(targetWidth)
     }
-
     updateFrameWidth()
     window.addEventListener('resize', updateFrameWidth)
     return () => window.removeEventListener('resize', updateFrameWidth)
@@ -52,7 +61,7 @@ export default function Timeline() {
       return n
     })
 
-  // 播放:用浮点累加器,避免高刷新率(120Hz)下每帧增量<0.5被 round 抹掉而卡死
+  // 播放
   useEffect(() => {
     if (!playing) return
     let acc = useEditor.getState().currentFrame
@@ -102,7 +111,29 @@ export default function Timeline() {
     setCurrentFrame(xToFrame(x))
   }
 
-  // 播放头 / 关键帧拖拽
+  const handleKfClick = (nodeId: string, prop: AnimatableProp, frame: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentFrame(frame)
+  }
+
+  const handleKfMouseDown = (nodeId: string, prop: AnimatableProp, frame: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDragging('kf')
+    setDragKf({ nodeId, prop, frame })
+  }
+
+  const handleKfDragCommit = (toFrame: number) => {
+    if (!dragKf || toFrame === dragKf.frame) {
+      setDragging(null)
+      setDragKf(null)
+      return
+    }
+    moveKeyframe(dragKf.nodeId, dragKf.prop, dragKf.frame, toFrame)
+    setDragging(null)
+    setDragKf(null)
+  }
+
+  // 播放头拖拽
   useEffect(() => {
     if (dragging !== 'head') return
     const onMove = (e: MouseEvent) => {
@@ -126,7 +157,7 @@ export default function Timeline() {
     const node = scene.nodes.find((n) => n.id === firstId)
     if (!node) return
     const frames = new Set<number>()
-    Object.values(node.keyframes).forEach((arr) => arr?.forEach((k) => frames.add(k.frame)))
+    Object.values(node.keyframes).forEach((arr) => arr?.forEach((kf) => frames.add(kf.frame)))
     const sorted = [...frames].sort((a, b) => a - b)
     if (dir === -1) {
       const prev = sorted.filter((f) => f < currentFrame).pop()
@@ -174,6 +205,14 @@ export default function Timeline() {
         <div className="w-px h-5 bg-edge mx-1" />
         <button onClick={() => jumpKeyframe(-1)} disabled={selectedIds.length === 0} title="上一关键帧" className="icon-btn disabled:opacity-30"><ChevronLeft size={15} /></button>
         <button onClick={() => jumpKeyframe(1)} disabled={selectedIds.length === 0} title="下一关键帧" className="icon-btn disabled:opacity-30"><ChevronRight size={15} /></button>
+        <div className="w-px h-5 bg-edge mx-1" />
+        <button
+          onClick={toggleAll}
+          title={allCollapsed ? '全部展开' : '全部折叠'}
+          className="icon-btn"
+        >
+          {allCollapsed ? <ChevronsUpDown size={15} /> : <ChevronsDownUp size={15} />}
+        </button>
         <div className="flex-1" />
         {autoKey && <span className="text-[10px] text-danger font-semibold uppercase tracking-wider mr-2">自动关键</span>}
         <div className="text-xs font-mono text-muted tabular-nums">
@@ -183,13 +222,12 @@ export default function Timeline() {
         </div>
       </div>
 
-      {/* Body: flow 布局,播放头垂直覆盖全部内容 */}
+      {/* Body */}
       <div ref={containerRef} className="flex-1 overflow-auto relative">
         <div className="relative" style={{ width: totalWidth, minHeight: '100%' }}>
           {/* Ruler (sticky) */}
           <div className="sticky top-0 z-10 border-b border-edge bg-panel1/95 backdrop-blur" style={{ height: HEADER_HEIGHT }}>
             {Array.from({ length: scene.duration + 1 }, (_, f) => f).map((f) => {
-              // 根据当前 frameWidth 动态调整刻度密度
               let majorInterval = 30
               let minorInterval = 5
               if (frameWidth < 8) { majorInterval = 60; minorInterval = 10 }
@@ -223,12 +261,12 @@ export default function Timeline() {
                     <ChevronDown size={12} className={['text-muted transition-transform', expanded ? '' : '-rotate-90'].join(' ')} />
                     <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: node.fill }} />
                     <span className="text-[11px] text-text truncate select-none max-w-[160px]">{node.name}</span>
-                    {!node.visible && <EyeOff size={11} className="text-muted/50" />}
+                    {!node.visible && <EyeOff size={11} className="text-muted/50 shrink-0" />}
                   </div>
 
                   {expanded && ANIMATABLE_PROPS.map((prop) => {
                     const kfs = node.keyframes[prop] || []
-                    const hasCurrent = kfs.some((k) => k.frame === Math.round(currentFrame))
+                    const hasCurrent = kfs.some((kf) => kf.frame === Math.round(currentFrame))
                     return (
                       <div
                         key={prop}
@@ -237,17 +275,20 @@ export default function Timeline() {
                         onClick={(e) => { e.stopPropagation(); handleTrackClick(e) }}
                       >
                         <span className="absolute left-1.5 text-[9px] text-muted/70 leading-[22px] select-none">{PROP_LABEL[prop]}</span>
-                        {kfs.map((kf) => (
-                          <KeyframeDot
-                            key={`${node.id}-${prop}-${kf.frame}`}
-                            x={frameToX(kf.frame)}
-                            y={TRACK_HEIGHT / 2}
-                            selected={Math.round(currentFrame) === kf.frame}
-                            onClick={(e) => { e.stopPropagation(); setCurrentFrame(kf.frame) }}
-                            onDelete={(e) => { e.stopPropagation(); removeKeyframe(node.id, prop, kf.frame) }}
-                            onMouseDown={(e) => { e.stopPropagation(); setDragging('kf'); setDragKf({ nodeId: node.id, prop, frame: kf.frame }) }}
-                          />
-                        ))}
+                        {kfs.map((kf) => {
+                          const isCurrent = Math.round(currentFrame) === kf.frame
+                          return (
+                            <KeyframeDot
+                              key={`${node.id}_${prop}_${kf.frame}`}
+                              x={frameToX(kf.frame)}
+                              y={TRACK_HEIGHT / 2}
+                              selected={isCurrent}
+                              onClick={(e) => handleKfClick(node.id, prop, kf.frame, e)}
+                              onDelete={(e) => { e.stopPropagation(); removeKeyframe(node.id, prop, kf.frame) }}
+                              onMouseDown={(e) => handleKfMouseDown(node.id, prop, kf.frame, e)}
+                            />
+                          )
+                        })}
                         <button
                           className={'absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 rotate-45 rounded-[1px] kf-toggle' + (hasCurrent ? ' kf-toggle-on' : '')}
                           title={hasCurrent ? '删除当前关键帧' : '添加关键帧'}
@@ -262,12 +303,14 @@ export default function Timeline() {
             {scene.nodes.length === 0 && <div className="px-3 py-8 text-xs text-muted text-center">暂无图层</div>}
           </div>
 
-          {/* Playhead: 覆盖全部内容高度 */}
-          <div className="absolute top-0 bottom-0 w-px bg-accent z-20 pointer-events-none" style={{ left: frameToX(currentFrame) }}>
-            <div
-              className="absolute -top-0.5 -left-[5px] w-[11px] h-[11px] bg-accent rotate-45 rounded-[2px] shadow cursor-ew-resize pointer-events-auto"
-              onMouseDown={(e) => { e.stopPropagation(); setDragging('head') }}
-            />
+          {/* Playhead */}
+          <div
+            className="absolute top-0 bottom-0 z-20 cursor-ew-resize"
+            style={{ left: frameToX(currentFrame), width: 8, marginLeft: -4 }}
+            onMouseDown={(e) => { e.stopPropagation(); setDragging('head') }}
+          >
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-accent pointer-events-none" />
+            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-[11px] h-[11px] bg-accent rotate-45 rounded-[2px] shadow pointer-events-none" />
           </div>
         </div>
       </div>
@@ -277,7 +320,7 @@ export default function Timeline() {
           containerRef={containerRef}
           frameWidth={frameWidth}
           duration={scene.duration}
-          onCommit={(frame) => { if (frame !== dragKf.frame) moveKeyframe(dragKf.nodeId, dragKf.prop, dragKf.frame, frame) }}
+          onCommit={handleKfDragCommit}
         />
       )}
     </div>
@@ -293,10 +336,14 @@ function KeyframeDot(props: {
   onMouseDown: (e: React.MouseEvent) => void
 }) {
   const { x, y, selected, onClick, onDelete, onMouseDown } = props
+  const cls = [
+    'absolute w-2.5 h-2.5 rotate-45 rounded-[1px] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-20',
+    selected ? 'kf-dot-selected' : 'kf-dot'
+  ].join(' ')
   return (
     <div
-      className={'absolute w-2.5 h-2.5 rotate-45 rounded-[1px] -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 kf-dot' + (selected ? ' kf-dot-selected' : '')}
-      style={{ left: x, top: y }}
+      className={cls}
+      style={{ left: x, top: y, transformOrigin: 'center' }}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onContextMenu={(e) => { e.preventDefault(); onDelete(e) }}
@@ -317,7 +364,8 @@ function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; frame
     const onUp = (e: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (rect) {
-        const x = e.clientX - rect.left + (containerRef.current?.scrollLeft ?? 0)
+        const scrollLeft = containerRef.current?.scrollLeft ?? 0
+        const x = e.clientX - rect.left + scrollLeft
         onCommit(xToFrame(x))
       }
       window.removeEventListener('mousemove', onMove)
@@ -326,7 +374,7 @@ function DragGhost(props: { containerRef: React.RefObject<HTMLDivElement>; frame
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
-  }, [frameWidth, duration])
+  }, [frameWidth, duration, onCommit, containerRef])
   if (!pos) return null
   return <div className="fixed w-2.5 h-2.5 rotate-45 rounded-[1px] bg-accent pointer-events-none z-50" style={{ left: pos.x, top: pos.y, transform: 'translate(-50%, -50%) rotate(45deg)' }} />
 }

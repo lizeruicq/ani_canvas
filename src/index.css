@@ -47,8 +47,8 @@ input, select, textarea { color-scheme: light; }
 }
 .kf-dot:hover { background-color: #4f7cff; }
 .kf-dot-selected {
-  background-color: #4f7cff;
-  box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.4);
+  background-color: #7dd3fc;
+  box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.5);
 }
 .kf-toggle {
   border: 1px solid #aab2c4;
