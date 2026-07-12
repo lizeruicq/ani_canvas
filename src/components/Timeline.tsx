@@ -67,16 +67,24 @@ export default function Timeline() {
     let acc = useEditor.getState().currentFrame
     let last = performance.now()
     let raf = 0
+    let lastEmittedFrame = Math.round(acc)
     const tick = (now: number) => {
       const dt = (now - last) / 1000
       last = now
       const s = useEditor.getState()
       acc += dt * s.scene.fps
       if (acc >= s.scene.duration) {
-        if (s.loop) acc = 0
+        if (s.loop) { acc = 0; lastEmittedFrame = -1 }
         else { acc = s.scene.duration; s.setPlaying(false) }
       }
-      s.setCurrentFrame(acc)
+      // 仅在整数帧发生变化时才推送到 store,避免同一帧被多次 setState
+      // 触发全画布重渲染 (fps 30 时,一秒 rAF ~60 次,若不去重,会产生一半的
+      // 无效渲染开销)
+      const nextFrame = Math.round(acc)
+      if (nextFrame !== lastEmittedFrame) {
+        lastEmittedFrame = nextFrame
+        s.setCurrentFrame(nextFrame)
+      }
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)

@@ -187,7 +187,12 @@ export const useEditor = create<EditorState>()(immer((set, get) => ({
     }
   }),
   setCurrentFrame: (f) =>
-    set((s) => ({ currentFrame: Math.max(0, Math.min(s.scene.duration, Math.round(f))) })),
+    set((s) => {
+      const next = Math.max(0, Math.min(s.scene.duration, Math.round(f)))
+      // 帧号未变直接返回,避免 zustand 触发订阅者重渲染
+      if (next === s.currentFrame) return {}
+      return { currentFrame: next }
+    }),
   setPlaying: (p) => set({ playing: p }),
   toggleLoop: () => set((s) => ({ loop: !s.loop })),
   toggleAutoKey: () => set((s) => ({ autoKey: !s.autoKey })),

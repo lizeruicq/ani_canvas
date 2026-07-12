@@ -33,18 +33,23 @@ export function sampleKeyframes(
   baseValue: number,
 ): number {
   if (!kfs || kfs.length === 0) return baseValue
-  const sorted = kfs.length > 1 ? [...kfs].sort((a, b) => a.frame - b.frame) : kfs
-  if (frame <= sorted[0].frame) return sorted[0].value
-  const last = sorted[sorted.length - 1]
+  const n = kfs.length
+  // 关键帧数组在写入时始终维护为按 frame 升序 (见 store/dsl 逻辑),
+  // 因此这里直接二分查找,无需再排序,避免每次 clone+sort。
+  const first = kfs[0]
+  if (frame <= first.frame) return first.value
+  const last = kfs[n - 1]
   if (frame >= last.frame) return last.value
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const a = sorted[i], b = sorted[i + 1]
-    if (frame >= a.frame && frame <= b.frame) {
-      const span = b.frame - a.frame || 1
-      const t = (frame - a.frame) / span
-      const eased = applyEasing(t, b.easing) // 区段缓动取右端关键帧的 easing
-      return a.value + (b.value - a.value) * eased
-    }
+  // 二分查找 frame 所在的区间 [lo, hi]
+  let lo = 0, hi = n - 1
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1
+    if (kfs[mid].frame <= frame) lo = mid
+    else hi = mid
   }
-  return baseValue
+  const a = kfs[lo], b = kfs[hi]
+  const span = b.frame - a.frame || 1
+  const t = (frame - a.frame) / span
+  const eased = applyEasing(t, b.easing) // 区段缓动取右端关键帧的 easing
+  return a.value + (b.value - a.value) * eased
 }

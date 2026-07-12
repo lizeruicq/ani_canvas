@@ -6,6 +6,11 @@ import { EffectiveProps } from '../model/effective'
 export interface NodeRendererProps {
   node: SceneNode
   eff: EffectiveProps
+  /**
+   * 是否响应鼠标事件。播放中传入 false 可以跳过 Konva 的命中测试,
+   * 显著降低大量节点场景的每帧渲染开销。
+   */
+  listening?: boolean
   nodeRef?: (ref: Konva.Node | null) => void
   onMouseDown?: (e: Konva.KonvaEventObject<MouseEvent>) => void
   onDragStart?: (e: Konva.KonvaEventObject<DragEvent>) => void
@@ -16,6 +21,7 @@ export interface NodeRendererProps {
 
 export default function NodeRenderer(props: NodeRendererProps) {
   const { node, eff } = props
+  const listening = props.listening !== false
   const common = {
     x: eff.x,
     y: eff.y,
@@ -24,7 +30,12 @@ export default function NodeRenderer(props: NodeRendererProps) {
     scaleY: eff.scaleY,
     opacity: eff.opacity,
     visible: node.visible,
-    draggable: !node.locked && props.onDragEnd !== undefined,
+    listening,
+    // 关闭 listening 时同时关闭 perfectDrawEnabled/shadowForStrokeEnabled,
+    // 让 Konva 走快速渲染路径 (跳过 stroke/hit canvas 复合)。
+    perfectDrawEnabled: listening,
+    shadowForStrokeEnabled: false,
+    draggable: listening && !node.locked && props.onDragEnd !== undefined,
     onMouseDown: props.onMouseDown,
     onDragStart: props.onDragStart,
     onDragEnd: props.onDragEnd,

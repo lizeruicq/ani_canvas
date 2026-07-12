@@ -46,6 +46,8 @@ export default function CanvasStage() {
   const offsetY = (size.h - stageH) / 2
 
   // 更新 Transformer 绑定的节点
+  // 播放中不将 currentFrame 加入依赖,避免每帧都重新绑定/batchDraw,
+  // 大幅降低播放时的调度开销。
   useEffect(() => {
     const tr = transformerRef.current
     if (!tr) return
@@ -59,7 +61,7 @@ export default function CanvasStage() {
     }
     tr.nodes([])
     tr.getLayer()?.batchDraw()
-  }, [selectedIds, tool, scene.nodes, currentFrame, playing])
+  }, [selectedIds, tool, scene.nodes, playing, playing ? 0 : currentFrame])
 
   const [drawing, setDrawing] = useState<{
     type: NodeType
@@ -345,6 +347,7 @@ export default function CanvasStage() {
                   key={node.id}
                   node={node}
                   eff={eff}
+                  listening={!playing}
                   nodeRef={(ref) => {
                     if (ref) nodeRefs.current.set(node.id, ref)
                     else nodeRefs.current.delete(node.id)
